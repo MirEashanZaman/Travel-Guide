@@ -2,6 +2,7 @@
 session_start();
 
 require 'config/database.php';
+require 'app.php';
 require 'app/models/Post.php';
 require 'app/models/admin_model.php';
 require 'app/controllers/PostController.php';
