@@ -1,7 +1,5 @@
 <?php
-session_start();
-
-require_once 'database.php';
+require_once 'config/database.php';
 
 define('ROOT_URL', 'http://localhost/travel-guide/');
 define('APP_NAME', 'Travel Guide');
