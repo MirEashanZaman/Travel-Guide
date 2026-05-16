@@ -5,10 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     role ENUM('admin', 'scout', 'user') NOT NULL DEFAULT 'user',
     is_verified TINYINT(1) NOT NULL DEFAULT 0,
     profile_picture VARCHAR(255) DEFAULT NULL,
+    remember_token VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -21,6 +22,7 @@ CREATE TABLE IF NOT EXISTS posts (
     genre VARCHAR(100) DEFAULT NULL,
     cost_level ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
     travel_medium_info TEXT,
+    image_path VARCHAR(255) DEFAULT NULL,
     status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -30,10 +32,12 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE TABLE IF NOT EXISTS post_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     scout_id INT NOT NULL,
+    original_post_id INT DEFAULT NULL,
     post_data JSON NOT NULL,
     requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-    FOREIGN KEY (scout_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (scout_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (original_post_id) REFERENCES posts(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS wishlist (

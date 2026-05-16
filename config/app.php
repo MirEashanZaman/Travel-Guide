@@ -1,5 +1,5 @@
 <?php
-define('ROOT_URL', 'http://localhost/travel-guide/');
+define('ROOT_URL', 'http://localhost/travel_guide/Travel-Guide/');
 define('APP_NAME', 'Travel Guide');
 
 function sanitize($data) {
@@ -10,4 +10,5 @@ function redirect($location) {
     header("Location: " . ROOT_URL . $location);
     exit;
 }
+
 ?>

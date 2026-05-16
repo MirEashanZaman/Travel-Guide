@@ -5,6 +5,16 @@ function getApprovedPosts($conn) {
     return mysqli_fetch_all($r, MYSQLI_ASSOC);
 }
 
+//Fetch all approved posts submitted by a specific scout
+function getPostsByScout($conn, $scoutId) {
+    $stmt = mysqli_prepare($conn, "SELECT * FROM posts WHERE scout_id = ? AND status = 'approved' ORDER BY created_at DESC");
+    mysqli_stmt_bind_param($stmt, 'i', $scoutId);
+    mysqli_stmt_execute($stmt);
+    $rows = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $rows;
+}
+
 //Fetch a single post by its ID for the detail page
 function getPost($conn, $id) {
     $stmt = mysqli_prepare($conn, "SELECT * FROM posts WHERE id = ? AND status = 'approved'");
@@ -40,7 +50,7 @@ function addComment($conn, $postId, $userId, $content) {
     return $ok;
 }
 
-//Fetch all comments for a post, including the user's name
+//Fetch all comments for a post, including the user name
 function getComments($conn, $postId) {
     $stmt = mysqli_prepare($conn, 
         "SELECT comments.*, users.name as user_name 
@@ -73,5 +83,53 @@ function getCostEstimate($conn, $postId) {
     $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
     mysqli_stmt_close($stmt);
     return $row;
+}
+function filterPosts($conn, $params) {
+    $sql = "SELECT * FROM posts WHERE status = 'approved'";
+    $types = "";
+    $args = [];
+
+    if (!empty($params['q'])) {
+        $sql .= " AND (title LIKE ? OR country LIKE ?)";
+        $q = "%" . $params['q'] . "%";
+        $args[] = $q; $args[] = $q;
+        $types .= "ss";
+    }
+
+    if (!empty($params['country'])) {
+        $sql .= " AND country = ?";
+        $args[] = $params['country'];
+        $types .= "s";
+    }
+
+    if (!empty($params['cost_level'])) {
+        $sql .= " AND cost_level = ?";
+        $args[] = $params['cost_level'];
+        $types .= "s";
+    }
+
+    if (!empty($params['genres'])) {
+        $genreList = $params['genres'];
+        $placeholders = implode(',', array_fill(0, count($genreList), '?'));
+        $sql .= " AND genre IN ($placeholders)";
+        foreach ($genreList as $g) {
+            $args[] = $g;
+            $types .= "s";
+        }
+    }
+
+    $sql .= " ORDER BY created_at DESC";
+    
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!empty($args)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$args);
+    }
+    mysqli_stmt_execute($stmt);
+    return mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+}
+
+function getAllCountries($conn) {
+    $r = mysqli_query($conn, "SELECT DISTINCT country FROM posts WHERE status = 'approved' ORDER BY country ASC");
+    return mysqli_fetch_all($r, MYSQLI_ASSOC);
 }
 ?>
