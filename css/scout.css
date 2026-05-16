@@ -1,0 +1,113 @@
+/* Form Field Layout */
+.form .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.form .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.form .field input,
+.form .field select,
+.form .field textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: var(--paletton-6);
+    color: var(--text-main);
+}
+
+.form .field input:focus,
+.form .field select:focus,
+.form .field textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+}
+
+/* Row layout for side-by-side fields */
+.field-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.field-row .field {
+    flex: 1;
+    margin-bottom: 0;
+    /* Reset margin when in a row */
+}
+
+/* Form Action Buttons */
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Textarea specific styling */
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Status-specific Badge overrides (matches cost-badges) */
+.cost-badge.pending {
+    background-color: var(--paletton-6);
+    color: var(--paletton-1);
+    border: 1px solid var(--paletton-5);
+}
+
+.cost-badge.approved {
+    background-color: var(--paletton-5);
+    color: var(--paletton-1);
+    border: 1px solid var(--paletton-4);
+}
+
+.cost-badge.rejected {
+    background-color: var(--paletton-4);
+    color: var(--paletton-1);
+    border: 1px solid var(--paletton-3);
+}
+
+/* Current Image Preview */
+.current-image-preview {
+    max-width: 200px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    margin-top: 5px;
+}
+
+/* Approved Post Card */
+.approved-post-title {
+    border: none;
+    margin-bottom: 5px;
+}
+
+.approved-post-meta {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.approved-post-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-sm.btn-request {
+    font-size: 11px;
+}
