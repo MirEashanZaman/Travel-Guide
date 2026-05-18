@@ -29,7 +29,7 @@
                 <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="index.php?page=register" class="form">
+            <form method="POST" action="index.php?page=registration" class="form">
                 <div class="field">
                     <label for="name">Full Name</label>
                     <input type="text" id="name" name="name" value="<?= htmlspecialchars($old['name'] ?? '') ?>" 

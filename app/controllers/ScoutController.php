@@ -171,17 +171,17 @@ function scoutCtrl($conn) {
     foreach ($rawRequests as $r) {
         $r['data'] = json_decode($r['post_data'], true);
         
-        // If the request was approved, verify if the post still exists in the database
+        //If the request was approved, verify if the post still exists in the database
         if ($r['status'] === 'approved') {
             $postExists = false;
             foreach ($approvedPosts as $key => $post) {
                 if ($post['title'] === $r['data']['title']) {
                     $postExists = true;
-                    unset($approvedPosts[$key]); // Consume this post so duplicate titles don't reuse it
+                    unset($approvedPosts[$key]);
                     break;
                 }
             }
-            // If it was approved but the post is missing, it means it was deleted by an admin
+            //If it was approved but the post is missing, it means it was deleted
             if (!$postExists) {
                 $r['status'] = 'deleted';
             }
