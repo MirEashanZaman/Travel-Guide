@@ -87,7 +87,7 @@ function registerCtrl($conn) {
         } else {
             //Call the Model function
             if (addUser($conn, $name, $email, $password, $role)) {
-                $_SESSION['success_flash'] = 'Account created! Please wait for admin approval before logging in.';
+                $_SESSION['success_flash'] = 'Admin needs to verify the account first. You can logging in after the approval!';
                 header('Location: index.php?page=login');
                 exit;
             } else {
