@@ -154,12 +154,12 @@ $isGeneralUser = ($user['role'] === 'user' && $user['is_verified'] == 1);
                 <form id="commentForm" method="POST" action="index.php?page=user&action=add_comment" class="form">
                     <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
                     <div class="field">
-                        <label>Posting as</label>
+                        <label>Comment as</label>
                         <input type="text" value="<?= htmlspecialchars($user['name']) ?>" disabled class="calc-input calc-disabled-input">
-                        <span class="muted comment-info-text">Name from your profile</span>
+
                     </div>
                     <div class="field">
-                        <label for="content">Your Experience</label>
+                        <label for="content">Your Comment</label>
                         <textarea id="commentContent" name="content" placeholder="Write a comment..." required rows="3" maxlength="500"></textarea>
                         <span class="muted comment-info-text">Max 500 characters</span>
                     </div>

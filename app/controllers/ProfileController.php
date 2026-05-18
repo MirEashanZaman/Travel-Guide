@@ -78,6 +78,20 @@ function profileCtrl($conn) {
         }
     }
 
+    //Delete Profile Picture
+    if ($action === 'delete_pic') {
+        if (!empty($_SESSION['user']['profile_picture'])) {
+            $oldPic = $_SESSION['user']['profile_picture'];
+            if (file_exists($oldPic)) {
+                unlink($oldPic);
+            }
+            updateProfilePic($conn, $userId, null);
+            $_SESSION['user']['profile_picture'] = null;
+            header("Location: index.php?page=profile&msg=pic_updated");
+            exit;
+        }
+    }
+
     //Fetch the latest user data to show in the view
     $user = getUserById($conn, $userId);
 

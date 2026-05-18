@@ -8,9 +8,9 @@ $isEdit = !empty($editing);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scout Dashboard &mdash; <?= APP_NAME ?></title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/posts.css">
-    <link rel="stylesheet" href="css/scout.css">
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="css/posts.css?v=2">
+    <link rel="stylesheet" href="css/scout.css?v=2">
 </head>
 
 <body class="app-body">
