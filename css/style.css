@@ -2,18 +2,27 @@
    GLOBAL STYLE - The Foundation
    ================================================================ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
 :root {
-    --paletton-1: #13153B; /* Darkest */
-    --paletton-2: #272A6F; /* Darker / Primary */
-    --paletton-3: #4A4E8E; /* Dark / Nav */
-    --paletton-4: #7074B4; /* Mid / Page Bg */
-    --paletton-5: #A2A6CD; /* Light / Borders */
-    --paletton-6: #C1C4DF; /* Lighter / Cards */
-    --paletton-7: #E0E2F0; /* Lightest / Badges */
+    --paletton-1: #13153B;
+    /* Darkest */
+    --paletton-2: #272A6F;
+    /* Darker / Primary */
+    --paletton-3: #4A4E8E;
+    /* Dark / Nav */
+    --paletton-4: #7074B4;
+    /* Mid / Page Bg */
+    --paletton-5: #A2A6CD;
+    /* Light / Borders */
+    --paletton-6: #C1C4DF;
+    /* Lighter / Cards */
+    --paletton-7: #E0E2F0;
+    /* Lightest / Badges */
 
     --bg-color: var(--paletton-4);
     --nav-bg: var(--paletton-3);
@@ -272,7 +281,7 @@ img.user-avatar {
     align-items: center;
     gap: 10px;
     margin-right: 20px;
-    width: 400px; 
+    width: 400px;
 }
 
 .form-aligned .field label {
@@ -282,10 +291,10 @@ img.user-avatar {
     color: var(--text-main);
 }
 
-.form-aligned .field input, 
-.form-aligned .field select, 
+.form-aligned .field input,
+.form-aligned .field select,
 .form-aligned .field textarea {
-    width: 250px; 
+    width: 250px;
     padding: 8px 12px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -294,7 +303,7 @@ img.user-avatar {
     outline: none;
 }
 
-.field input:focus, 
+.field input:focus,
 .field select:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px var(--paletton-5);
@@ -308,7 +317,8 @@ img.user-avatar {
     margin-top: 25px;
 }
 
-.hero-actions, .home-footer-actions {
+.hero-actions,
+.home-footer-actions {
     display: flex;
     gap: 15px;
     margin-top: 25px;
@@ -327,7 +337,8 @@ body.app-body:has(.home-footer-actions) {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-color: #ffffff; /* Fallback */
+    background-color: #ffffff;
+    /* Fallback */
 }
 
 body.app-body:has(.home-actions) .navbar,

@@ -65,6 +65,9 @@ $userId = $_SESSION['user']['id'];
                         <input type="file" name="profile_pic" style="display:none" onchange="this.form.submit()">
                     </label>
                 </form>
+                <?php if (!empty($user['profile_picture'])): ?>
+                    <a href="index.php?page=profile&action=delete_pic" class="btn btn-ghost" style="margin-top: 10px; color: var(--paletton-4);" onclick="return confirm('Are you sure you want to delete your photo?');">Remove photo</a>
+                <?php endif; ?>
             </div>
         </div>
 

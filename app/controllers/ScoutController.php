@@ -164,10 +164,29 @@ function scoutCtrl($conn) {
         }
     }
 
+    $approvedPosts = getPostsByScout($conn, $scoutId);
+
     $rawRequests = getRequestsByScout($conn, $scoutId);
     $requests = [];
     foreach ($rawRequests as $r) {
         $r['data'] = json_decode($r['post_data'], true);
+        
+        // If the request was approved, verify if the post still exists in the database
+        if ($r['status'] === 'approved') {
+            $postExists = false;
+            foreach ($approvedPosts as $key => $post) {
+                if ($post['title'] === $r['data']['title']) {
+                    $postExists = true;
+                    unset($approvedPosts[$key]); // Consume this post so duplicate titles don't reuse it
+                    break;
+                }
+            }
+            // If it was approved but the post is missing, it means it was deleted by an admin
+            if (!$postExists) {
+                $r['status'] = 'deleted';
+            }
+        }
+        
         $requests[] = $r;
     }
     

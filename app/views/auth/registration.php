@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration &mdash; <?= APP_NAME ?></title>
+    <title>Register &mdash; <?= APP_NAME ?></title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/auth.css">
-
 </head>
+
 <body class="auth-body">
 
 <div class="auth-shell">
@@ -29,7 +29,7 @@
                 <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="index.php?page=registration" class="form">
+            <form method="POST" action="index.php?page=register" class="form">
                 <div class="field">
                     <label for="name">Full Name</label>
                     <input type="text" id="name" name="name" value="<?= htmlspecialchars($old['name'] ?? '') ?>" 
@@ -45,7 +45,6 @@
                     <select name="role" id="role">
                         <option value="user" <?= ($old['role'] == 'user') ? 'selected' : '' ?>>General User</option>
                         <option value="scout" <?= ($old['role'] == 'scout') ? 'selected' : '' ?>>Travel Scout</option>
-                        <option value="admin" <?= ($old['role'] == 'admin') ? 'selected' : '' ?>>Administrator</option>
                     </select>
                 </div>
                 <div class="field-row">
@@ -68,31 +67,5 @@
     </div>
 </div>
 
-<script>
-document.querySelector('.form').addEventListener('submit', function(e) {
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirm_password').value;
-    const email = document.getElementById('email').value;
-    
-    if (password.length < 8) {
-        alert('Password must be at least 8 characters long.');
-        e.preventDefault();
-        return;
-    }
-    
-    if (password !== confirm) {
-        alert('Passwords do not match.');
-        e.preventDefault();
-        return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address.');
-        e.preventDefault();
-        return;
-    }
-});
-</script>
 </body>
 </html>
