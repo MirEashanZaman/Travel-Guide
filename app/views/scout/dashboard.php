@@ -56,7 +56,7 @@ $isEdit = !empty($editing);
                 }
             ?>
         </h3>
-        <form method="POST" action="index.php?page=scout&action=<?= $isEdit ? 'update' : 'add' ?>" class="form" enctype="multipart/form-data">
+        <form method="POST" action="index.php?page=scout&action=<?= (!empty($editing['id'])) ? 'update' : 'add' ?>" class="form" enctype="multipart/form-data">
             <?php if ($isEdit): ?>
                 <input type="hidden" name="request_id" value="<?= $editing['id'] ?? '' ?>">
                 <input type="hidden" name="original_post_id" value="<?= $editing['original_post_id'] ?? '' ?>">

@@ -10,7 +10,7 @@ function loginCtrl($conn) {
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email    = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $password = trim($_POST['password'] ?? '');
         $remember = isset($_POST['remember']);
 
         if ($email === '' || $password === '') {
@@ -70,8 +70,8 @@ function registerCtrl($conn) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name     = trim($_POST['name'] ?? '');
         $email    = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $confirm  = $_POST['confirm_password'] ?? '';
+        $password = trim($_POST['password'] ?? '');
+        $confirm  = trim($_POST['confirm_password'] ?? '');
         $role     = $_POST['role'] ?? 'user';
         $old = compact('name', 'email', 'role');
 

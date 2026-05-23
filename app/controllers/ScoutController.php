@@ -141,6 +141,7 @@ function scoutCtrl($conn) {
                 if ($req['status'] === 'pending') {
                     $editing = json_decode($req['post_data'], true);
                     $editing['id'] = $req['id'];
+                    $editing['original_post_id'] = $req['original_post_id'];
                 } else {
                     header('Location: index.php?page=scout&msg=error');
                     exit;
