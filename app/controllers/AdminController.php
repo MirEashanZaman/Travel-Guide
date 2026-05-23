@@ -9,7 +9,7 @@ function adminCtrl($conn) {
         if (isset($_GET['delete']) && isset($_GET['id'])) {
             $userId = intval($_GET['id']);
             
-            // Prevent self-deletion
+            //Self-deletion
             if ($userId === $_SESSION['user']['id']) {
                 $error = "You can't delete your own account";
             } else {
@@ -31,7 +31,7 @@ function adminCtrl($conn) {
             $role = $_POST['role'] ?? 'user';
             $v = intval($_POST['is_verified'] ?? 0);
 
-            // Check for unique email
+            //Check for unique email
             $stmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ?");
             mysqli_stmt_bind_param($stmt, 's', $email);
             mysqli_stmt_execute($stmt);
@@ -113,14 +113,18 @@ function adminCtrl($conn) {
         //Update an existing post
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_post'])) {
             $postId = intval($_POST['post_id']);
+            $baseCost = floatval($_POST['base_cost'] ?? 1500);
+            $derivedCostLevel = ($baseCost < 1000) ? 'low' : (($baseCost <= 2500) ? 'medium' : 'high');
+
             $data = [
                 'title' => trim($_POST['title']),
                 'country' => trim($_POST['country']),
                 'short_history' => trim($_POST['short_history']),
                 'genre' => trim($_POST['genre']),
-                'cost_level' => trim($_POST['cost_level']),
+                'cost_level' => $derivedCostLevel,
                 'travel_medium_info' => trim($_POST['travel_medium_info']),
-                'image_path' => $_POST['image_path'] ?? ''
+                'image_path' => $_POST['image_path'] ?? '',
+                'base_cost' => $baseCost
             ];
             if (updatePostAdmin($conn, $postId, $data)) {
                 header("Location: index.php?page=admin&action=posts&msg=post_updated");
