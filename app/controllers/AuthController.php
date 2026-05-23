@@ -10,7 +10,7 @@ function loginCtrl($conn) {
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email    = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $password = trim($_POST['password'] ?? '');
         $remember = isset($_POST['remember']);
 
         if ($email === '' || $password === '') {
@@ -70,8 +70,8 @@ function registerCtrl($conn) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name     = trim($_POST['name'] ?? '');
         $email    = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $confirm  = $_POST['confirm_password'] ?? '';
+        $password = trim($_POST['password'] ?? '');
+        $confirm  = trim($_POST['confirm_password'] ?? '');
         $role     = $_POST['role'] ?? 'user';
         $old = compact('name', 'email', 'role');
 
@@ -87,7 +87,7 @@ function registerCtrl($conn) {
         } else {
             //Call the Model function
             if (addUser($conn, $name, $email, $password, $role)) {
-                $_SESSION['success_flash'] = 'Account created! Please wait for admin approval before logging in.';
+                $_SESSION['success_flash'] = 'Admin needs to verify the account first. You can logging in after the approval!';
                 header('Location: index.php?page=login');
                 exit;
             } else {

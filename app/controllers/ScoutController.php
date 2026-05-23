@@ -141,6 +141,7 @@ function scoutCtrl($conn) {
                 if ($req['status'] === 'pending') {
                     $editing = json_decode($req['post_data'], true);
                     $editing['id'] = $req['id'];
+                    $editing['original_post_id'] = $req['original_post_id'];
                 } else {
                     header('Location: index.php?page=scout&msg=error');
                     exit;
@@ -164,10 +165,29 @@ function scoutCtrl($conn) {
         }
     }
 
+    $approvedPosts = getPostsByScout($conn, $scoutId);
+
     $rawRequests = getRequestsByScout($conn, $scoutId);
     $requests = [];
     foreach ($rawRequests as $r) {
         $r['data'] = json_decode($r['post_data'], true);
+        
+        //If the request was approved, verify if the post still exists in the database
+        if ($r['status'] === 'approved') {
+            $postExists = false;
+            foreach ($approvedPosts as $key => $post) {
+                if ($post['title'] === $r['data']['title']) {
+                    $postExists = true;
+                    unset($approvedPosts[$key]);
+                    break;
+                }
+            }
+            //If it was approved but the post is missing, it means it was deleted
+            if (!$postExists) {
+                $r['status'] = 'deleted';
+            }
+        }
+        
         $requests[] = $r;
     }
     

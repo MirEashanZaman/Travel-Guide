@@ -76,7 +76,8 @@ textarea {
     border: 1px solid var(--paletton-4);
 }
 
-.cost-badge.rejected {
+.cost-badge.rejected,
+.cost-badge.deleted {
     background-color: var(--paletton-4);
     color: var(--paletton-1);
     border: 1px solid var(--paletton-3);

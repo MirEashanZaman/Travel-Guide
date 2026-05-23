@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS comments (
     post_id INT NOT NULL,
     user_id INT NOT NULL,
     content TEXT NOT NULL,
+    rating TINYINT NOT NULL DEFAULT 5,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -68,3 +69,21 @@ CREATE TABLE IF NOT EXISTS cost_estimates (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    travelers INT NOT NULL,
+    days INT NOT NULL,
+    total_cost DECIMAL(10,2) NOT NULL,
+    travel_date DATE NOT NULL,
+    billing_name VARCHAR(100) NOT NULL,
+    billing_email VARCHAR(150) NOT NULL,
+    payment_method ENUM('card', 'bkash', 'nagad', 'paypal') NOT NULL DEFAULT 'card',
+    transaction_id VARCHAR(50) NOT NULL UNIQUE,
+    status ENUM('pending', 'paid', 'cancelled') NOT NULL DEFAULT 'paid',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
