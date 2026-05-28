@@ -112,3 +112,116 @@ textarea {
 .btn-sm.btn-request {
     font-size: 11px;
 }
+
+/* ── Itinerary Form Accordion Styles ── */
+.itinerary-section {
+    margin-top: 30px;
+    margin-bottom: 25px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 25px;
+}
+
+.itinerary-title-wrap {
+    margin-bottom: 15px;
+}
+
+.itinerary-main-title {
+    margin: 0 0 5px 0;
+    color: var(--text-main);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.itinerary-sub-title {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.itinerary-day-wrapper {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--white);
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(19, 21, 59, 0.05);
+    transition: box-shadow 0.3s;
+}
+
+.itinerary-day-wrapper:hover {
+    box-shadow: 0 4px 10px rgba(19, 21, 59, 0.1);
+}
+
+.itin-header {
+    background: var(--paletton-7);
+    padding: 14px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.itin-header:hover {
+    background: var(--paletton-6);
+}
+
+.itin-header-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.itin-chevron {
+    font-size: 16px;
+    color: var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.itin-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    padding: 0 20px;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.itin-body-content {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.time-block {
+    padding-left: 18px;
+    position: relative;
+}
+
+.time-block::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 2px;
+    width: 4px;
+    border-radius: 2px;
+}
+
+.time-block.morning::before { background: #f39c12; }
+.time-block.afternoon::before { background: #e67e22; }
+.time-block.evening::before { background: #9b59b6; }
+
+.time-block-title {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+}

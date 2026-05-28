@@ -15,6 +15,8 @@ require 'app/models/PostRequest.php';
 require 'app/controllers/ScoutController.php';
 require 'app/models/AdminModel.php';
 require 'app/controllers/AdminController.php';
+require 'app/models/Booking.php';
+require 'app/controllers/BookingController.php';
 
 
 
@@ -105,6 +107,9 @@ if ($page === 'admin' && $_SESSION['user']['role'] !== 'admin') { header('Locati
 if ($page === 'scout' && $_SESSION['user']['role'] !== 'scout') { header('Location: index.php?page=login'); exit; }
 if ($page === 'user'  && !in_array($_SESSION['user']['role'], ['user', 'scout', 'admin']))  { header('Location: index.php?page=login'); exit; }
 if ($page === 'wishlist' && $_SESSION['user']['role'] !== 'user') { header('Location: index.php?page=login'); exit; }
+if ($page === 'booking' && $_SESSION['user']['role'] !== 'user') { header('Location: index.php?page=login'); exit; }
+if ($page === 'booking_success' && !in_array($_SESSION['user']['role'], ['user', 'admin'])) { header('Location: index.php?page=login'); exit; }
+if ($page === 'my_travels' && $_SESSION['user']['role'] !== 'user') { header('Location: index.php?page=login'); exit; }
 
 // Verification gate: Non-verified users can only access home and logout
 if (isset($_SESSION['user']) && $_SESSION['user']['is_verified'] == 0 && !in_array($page, ['home', 'logout'])) {
@@ -122,6 +127,9 @@ switch ($page) {
     case 'user':     postCtrl($conn);     break;
     case 'wishlist':  wishlistCtrl($conn);  break; 
     case 'admin': adminCtrl($conn); break;
+    case 'booking':  bookingCtrl($conn);  break;
+    case 'booking_success': bookingSuccessCtrl($conn); break;
+    case 'my_travels':  myTravelsCtrl($conn);  break;
     default:
         header('Location: index.php?page=home');
         exit;

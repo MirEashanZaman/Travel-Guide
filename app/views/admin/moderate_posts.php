@@ -126,13 +126,18 @@ $user = $_SESSION['user'];
                         </select>
                     </div>
                     <div class="field">
-                        <label>Cost Level</label>
-                        <select name="cost_level" id="edit_cost">
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
+                        <label>Base Cost (USD)</label>
+                        <input type="number" name="base_cost" id="edit_base_cost" min="1" step="1" required placeholder="e.g. 1500" oninput="updateEditCostLevel()">
                     </div>
+                </div>
+                <div class="field">
+                    <label>Budget Tier (Derived)</label>
+                    <select name="cost_level_disabled" id="edit_cost" disabled style="background-color: var(--paletton-7); cursor: not-allowed; opacity: 0.8;">
+                        <option value="low">Budget (Under $1,000)</option>
+                        <option value="medium">Mid-Range ($1,000 - $2,500)</option>
+                        <option value="high">Luxury (Over $2,500)</option>
+                    </select>
+                    <input type="hidden" name="cost_level" id="edit_cost_hidden">
                 </div>
                 <div class="field">
                     <label>Travel Info</label>
@@ -148,13 +153,35 @@ $user = $_SESSION['user'];
     </div>
 
     <script>
+    function updateEditCostLevel() {
+        var baseCostVal = parseFloat(document.getElementById('edit_base_cost').value) || 0;
+        var select = document.getElementById('edit_cost');
+        var hidden = document.getElementById('edit_cost_hidden');
+        var tier = 'medium';
+        if (baseCostVal < 1000) {
+            tier = 'low';
+        } else if (baseCostVal <= 2500) {
+            tier = 'medium';
+        } else {
+            tier = 'high';
+        }
+        select.value = tier;
+        hidden.value = tier;
+    }
+
     function openEditPost(post) {
         document.getElementById('edit_post_id').value = post.id;
         document.getElementById('edit_title').value = post.title;
         document.getElementById('edit_country').value = post.country;
         document.getElementById('edit_history').value = post.short_history;
         document.getElementById('edit_genre').value = post.genre;
+        
+        var mapping = {'low': 500, 'medium': 1500, 'high': 3000};
+        var costVal = post.base_cost !== null && post.base_cost !== undefined ? parseFloat(post.base_cost) : (mapping[post.cost_level.toLowerCase()] || 1500);
+        document.getElementById('edit_base_cost').value = costVal;
+        
         document.getElementById('edit_cost').value = post.cost_level;
+        document.getElementById('edit_cost_hidden').value = post.cost_level;
         document.getElementById('edit_travel').value = post.travel_medium_info;
         document.getElementById('edit_image_path').value = post.image_path || '';
         document.getElementById('editModal').style.display = 'flex';
@@ -174,6 +201,8 @@ $user = $_SESSION['user'];
         });
     }
     </script>
+
+    <div class="card">
         <div class="card-toolbar">
             <h3 class="card-title">Pending Post Requests</h3>
             <span class="badge"><?= count($pendingRequests) ?> awaiting review</span>

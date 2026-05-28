@@ -65,6 +65,9 @@ $user = $_SESSION['user'];
                                     </span>
                                 </td>
                                 <td class="text-right">
+                                    <a class="btn-sm btn-edit" style="margin-right: 8px; font-weight: 600;"
+                                       href="index.php?page=user&action=detail&id=<?= $item['id'] ?>"
+                                       >View Details</a>
                                     <a class="btn-sm btn-delete" 
                                        href="javascript:void(0)" 
                                        onclick="removeWishlistItem(<?= $item['id'] ?>)"

@@ -10,16 +10,21 @@ function postCtrl($conn) {
         $content = trim($_POST['content'] ?? '');
 
         if ($content === '' || mb_strlen($content) > 500) {
-            $error = 'Comment must be 1-500 characters';
+            $error = 'Review must be 1-500 characters';
             $action = 'detail'; 
             $_GET['id'] = $postId;
         } elseif ($_SESSION['user']['is_verified'] != 1) {
-            $error = 'Your account need to be verified to post comments';
+            $error = 'Your account need to be verified to post reviews';
+            $action = 'detail';
+            $_GET['id'] = $postId;
+        } elseif ($_SESSION['user']['role'] === 'user' && !hasUserBookedPost($conn, $_SESSION['user']['id'], $postId)) {
+            $error = 'You can only review destinations you have booked.';
             $action = 'detail';
             $_GET['id'] = $postId;
         } else {
             $userId = $_SESSION['user']['id'];
-            if (addComment($conn, $postId, $userId, htmlspecialchars($content, ENT_QUOTES))) {
+            $rating = intval($_POST['rating'] ?? 5);
+            if (addComment($conn, $postId, $userId, htmlspecialchars($content, ENT_QUOTES), $rating)) {
                 if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                     $newId = mysqli_insert_id($conn);
                     echo json_encode([
@@ -28,6 +33,7 @@ function postCtrl($conn) {
                             'id' => $newId,
                             'user_name' => $_SESSION['user']['name'],
                             'content' => $content,
+                            'rating' => $rating,
                             'date' => date('M d, Y')
                         ]
                     ]);
@@ -78,6 +84,17 @@ function postCtrl($conn) {
         }
 
         $inWishlist = isPostInWishlist($conn, $_SESSION['user']['id'], $id);
+        $hasBooked = false;
+        if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'user') {
+            $hasBooked = hasUserBookedPost($conn, $_SESSION['user']['id'], $id);
+        }
+
+        // Fetch daily itinerary plan (with automatic seeding if empty)
+        $itinerary = getItinerary($conn, $id);
+        if (empty($itinerary)) {
+            seedDefaultItinerary($conn, $id);
+            $itinerary = getItinerary($conn, $id);
+        }
         
         require 'app/views/posts/detail.php'; 
         return;
@@ -86,6 +103,10 @@ function postCtrl($conn) {
     //Browse
     $posts = getApprovedPosts($conn);
     $countries = getAllCountries($conn);
+    $wishlistIds = [];
+    if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'user') {
+        $wishlistIds = getUserWishlistPostIds($conn, $_SESSION['user']['id']);
+    }
     require 'app/views/posts/browse.php'; 
 }
 ?>

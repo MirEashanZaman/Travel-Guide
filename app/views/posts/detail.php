@@ -32,6 +32,9 @@ $isGeneralUser = ($user['role'] === 'user' && $user['is_verified'] == 1);
                         <?= $inWishlist ? '&#128148; Remove Wishlist' : '&#10084; Add to Wishlist' ?>
                     </button>
                 <?php endif; ?>
+                <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'scout' && $_SESSION['user']['id'] == $post['scout_id']): ?>
+                    <a href="index.php?page=scout&action=request_change&id=<?= $post['id'] ?>" class="btn btn-primary">✏️ Request Edit</a>
+                <?php endif; ?>
                 <a href="index.php?page=user" class="btn btn-ghost">&larr; Back to Explore</a>
             </div>
         </div>
@@ -82,6 +85,73 @@ $isGeneralUser = ($user['role'] === 'user' && $user['is_verified'] == 1);
         <div class="detail-history">
             <label>About this place</label>
             <p><?= nl2br(htmlspecialchars($post['short_history'])) ?></p>
+        </div>
+    </div>
+
+    <!-- INTERACTIVE TRAVEL ITINERARY TIMELINE -->
+    <div class="card timeline-card">
+        <h3 class="card-title">&#128197; Interactive Travel Itinerary</h3>
+        <p class="page-sub" style="margin-top: -10px; margin-bottom: 20px; font-size: 13.5px;">Click on any day below to expand and discover your day-by-day customized travel activities!</p>
+        
+        <div class="timeline-container">
+            <?php 
+            // Group itinerary items by day number
+            $groupedItinerary = [];
+            foreach ($itinerary as $item) {
+                $groupedItinerary[$item['day_number']][] = $item;
+            }
+            ksort($groupedItinerary);
+            
+            $dayThemes = [
+                1 => 'Historical Wonders & Arrival',
+                2 => 'Scenic Exploration & Local Life',
+                3 => 'Hidden Gems & Skyline Views',
+                4 => 'Adventure Trails & Nature Escapes',
+                5 => 'Culinary Discoveries & Local Markets',
+                6 => 'Art, Heritage & Museums Tour',
+                7 => 'Coastal Vibes & Water Sports',
+                8 => 'Traditional Crafts & Workshops',
+                9 => 'Leisure, Spa & Botanical Gardens',
+                10 => 'Historic Neighborhoods Walking Tour',
+                11 => 'Mountain Vantage Points & Cable Cars',
+                12 => 'Ancient Castles & Fortresses',
+                13 => 'Eco-Tourism & Wilderness Wonders',
+                14 => 'Local Festivals & Music Nightlife',
+                15 => 'Souvenir Shopping & Departure'
+            ];
+            
+            foreach ($groupedItinerary as $day => $items): 
+                $theme = $dayThemes[$day] ?? 'Cultural Discoveries';
+                $isFirst = ($day === 1);
+            ?>
+                <div class="timeline-day-header <?= $isFirst ? 'active-header' : '' ?>" onclick="toggleDay(<?= $day ?>)" id="day-header-<?= $day ?>">
+                    <h3>📅 Day <?= $day ?>: <?= $theme ?></h3>
+                    <span class="chevron">&#9662;</span>
+                </div>
+                <div class="timeline-content <?= $isFirst ? 'active' : '' ?>" id="day-content-<?= $day ?>">
+                    <div class="timeline-items-list">
+                        <?php foreach ($items as $item): 
+                            $time = strtolower($item['time_of_day']);
+                            $icon = '☀️';
+                            if ($time === 'morning') $icon = '🌅';
+                            elseif ($time === 'evening') $icon = '🌙';
+                        ?>
+                            <div class="timeline-item">
+                                <div class="timeline-icon <?= $time ?>"><?= $icon ?></div>
+                                <div class="timeline-details">
+                                    <div class="timeline-details-header">
+                                        <h4><?= htmlspecialchars($item['activity_title']) ?></h4>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <span class="itinerary-time-tag <?= $time ?>"><?= $item['time_of_day'] ?></span>
+                                        </div>
+                                    </div>
+                                    <p><?= nl2br(htmlspecialchars($item['activity_description'])) ?></p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
@@ -176,9 +246,23 @@ $isGeneralUser = ($user['role'] === 'user' && $user['is_verified'] == 1);
     </div>
 </main>
 
-
-
 <script>
+function toggleDay(dayNum) {
+    var header = document.getElementById('day-header-' + dayNum);
+    var content = document.getElementById('day-content-' + dayNum);
+    if (!header || !content) return;
+    
+    var isActive = content.classList.contains('active');
+    
+    if (isActive) {
+        content.classList.remove('active');
+        header.classList.remove('active-header');
+    } else {
+        content.classList.add('active');
+        header.classList.add('active-header');
+    }
+}
+
 //Cost Calculator Logic
 var baseCost = <?= floatval($costInfo['base_cost']) ?>;
 var calcPeople = document.getElementById('calc_people');

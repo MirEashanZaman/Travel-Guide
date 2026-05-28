@@ -42,4 +42,18 @@ function isPostInWishlist($conn, $userId, $postId) {
     mysqli_stmt_close($stmt);
     return $exists;
 }
+
+//Get all post IDs saved in a user's wishlist
+function getUserWishlistPostIds($conn, $userId) {
+    $stmt = mysqli_prepare($conn, "SELECT post_id FROM wishlist WHERE user_id = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $userId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $ids = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $ids[] = intval($row['post_id']);
+    }
+    mysqli_stmt_close($stmt);
+    return $ids;
+}
 ?>

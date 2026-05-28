@@ -1,6 +1,37 @@
 <?php 
 $user = $_SESSION['user']; 
 $isEdit = !empty($editing);
+
+// Indexing helper for itinerary items to pre-populate during edit (max 15 days)
+$itinValues = [];
+for ($day = 1; $day <= 15; $day++) {
+    foreach (['morning', 'afternoon', 'evening'] as $time) {
+        $itinValues[$day][$time] = [
+            'activity_title' => '',
+            'activity_description' => '',
+            'estimated_cost' => ''
+        ];
+    }
+}
+
+$maxDay = 3; // Default to 3 days
+if ($isEdit && !empty($editing['itinerary']) && is_array($editing['itinerary'])) {
+    foreach ($editing['itinerary'] as $item) {
+        $day = intval($item['day_number']);
+        $time = $item['time_of_day'];
+        if ($day >= 1 && $day <= 15 && in_array($time, ['morning', 'afternoon', 'evening'])) {
+            $itinValues[$day][$time] = [
+                'activity_title' => $item['activity_title'] ?? '',
+                'activity_description' => $item['activity_description'] ?? '',
+                'estimated_cost' => $item['estimated_cost'] ?? ''
+            ];
+            if ($day > $maxDay) {
+                $maxDay = $day;
+            }
+        }
+    }
+}
+$maxDay = min(15, max(1, $maxDay));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,18 +134,80 @@ $isEdit = !empty($editing);
                     </select>
                 </div>
                 <div class="field">
-                    <label>Expected Cost Level</label>
-                    <select name="cost_level">
-                        <option value="low" <?= ($editing['cost_level'] ?? '') == 'low' ? 'selected' : '' ?>>Low</option>
-                        <option value="medium" <?= ($editing['cost_level'] ?? '') == 'medium' ? 'selected' : '' ?>>Medium</option>
-                        <option value="high" <?= ($editing['cost_level'] ?? '') == 'high' ? 'selected' : '' ?>>High</option>
-                    </select>
+                    <label>Expected Cost (USD)</label>
+                    <input type="number" name="expected_cost" min="1" step="1" value="<?= htmlspecialchars($editing['expected_cost'] ?? $editing['base_cost'] ?? 1500) ?>" required placeholder="e.g. 500">
                 </div>
             </div>
 
             <div class="field">
                 <label>Travel Medium Info</label>
                 <input type="text" name="travel_medium_info" value="<?= htmlspecialchars($editing['travel_medium_info'] ?? '') ?>" required>
+            </div>
+
+            <!-- Interactive Travel Itinerary Builder (Max 15 Days) -->
+            <div class="itinerary-section">
+                <div class="itinerary-title-wrap" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <h3 class="itinerary-main-title">📅 Custom Travel Itinerary <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">(Optional)</span></h3>
+                        <p class="itinerary-sub-title" style="margin: 0;">Provide daily plans for Morning, Afternoon, and Evening activities (up to 15 days max).</p>
+                    </div>
+                    <div class="field" style="margin-bottom: 0; width: 180px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Duration</label>
+                        <select id="itinerary_days_count" onchange="updateItineraryDays()" style="height: 38px; padding: 0 10px;">
+                            <?php for ($d = 1; $d <= 15; $d++): ?>
+                                <option value="<?= $d ?>" <?= ($d == $maxDay) ? 'selected' : '' ?>><?= $d ?> Day<?= $d > 1 ? 's' : '' ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="itinerary-accordions">
+                    <?php for ($day = 1; $day <= 15; $day++): 
+                        $isOpen = ($day === 1); // Open Day 1 by default
+                        $isActive = ($day <= $maxDay);
+                    ?>
+                        <div class="itinerary-day-wrapper day-accordion" id="day-wrapper-<?= $day ?>" style="display: <?= $isActive ? 'block' : 'none' ?>;">
+                            <div class="itin-header" onclick="toggleItinDay(<?= $day ?>)" id="itin-header-<?= $day ?>">
+                                <span class="itin-header-title">📅 Day <?= $day ?> Plan</span>
+                                <span class="itin-chevron" id="itin-chevron-<?= $day ?>" style="transform: <?= ($isOpen && $isActive) ? 'rotate(180deg)' : 'rotate(0deg)' ?>;">&#9662;</span>
+                            </div>
+                            
+                            <div class="itin-body" id="itin-body-<?= $day ?>" style="max-height: <?= ($isOpen && $isActive) ? '2000px' : '0px' ?>;">
+                                <div class="itin-body-content">
+                                    <?php foreach (['morning' => '🌅 Morning', 'afternoon' => '☀️ Afternoon', 'evening' => '🌙 Evening'] as $time => $label): ?>
+                                        <div class="time-block <?= $time ?>">
+                                            <h4 class="time-block-title"><?= $label ?></h4>
+                                            
+                                            <div class="field-row">
+                                                <div class="field" style="flex: 2;">
+                                                    <label>Activity Title</label>
+                                                    <input type="text" name="itinerary[<?= $day ?>][<?= $time ?>][activity_title]" 
+                                                           value="<?= htmlspecialchars($itinValues[$day][$time]['activity_title']) ?>" 
+                                                           placeholder="e.g. Sunrise Discovery Tour"
+                                                           <?= !$isActive ? 'disabled' : '' ?>>
+                                                </div>
+                                                <div class="field" style="flex: 1;">
+                                                    <label>Estimated Cost ($)</label>
+                                                    <input type="number" name="itinerary[<?= $day ?>][<?= $time ?>][estimated_cost]" 
+                                                           value="<?= htmlspecialchars($itinValues[$day][$time]['estimated_cost'] !== '' ? floatval($itinValues[$day][$time]['estimated_cost']) : '') ?>" 
+                                                           min="0" step="0.01" placeholder="e.g. 15.00"
+                                                           <?= !$isActive ? 'disabled' : '' ?>>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="field" style="margin-top: 10px;">
+                                                <label>Description</label>
+                                                <textarea name="itinerary[<?= $day ?>][<?= $time ?>][activity_description]" 
+                                                          rows="2" placeholder="Describe the activity, locations to visit, local options, etc."
+                                                          <?= !$isActive ? 'disabled' : '' ?>><?= htmlspecialchars($itinValues[$day][$time]['activity_description']) ?></textarea>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endfor; ?>
+                </div>
             </div>
 
             <div class="form-actions">
@@ -207,6 +300,51 @@ $isEdit = !empty($editing);
 
 
 <script>
+function toggleItinDay(dayNum) {
+    var header = document.getElementById('itin-header-' + dayNum);
+    var body = document.getElementById('itin-body-' + dayNum);
+    var chevron = document.getElementById('itin-chevron-' + dayNum);
+    if (!header || !body) return;
+    
+    // Check if currently active
+    var isActive = body.style.maxHeight !== '0px' && body.style.maxHeight !== '';
+    
+    if (isActive) {
+        body.style.maxHeight = '0px';
+        chevron.style.transform = 'rotate(0deg)';
+        header.style.background = 'var(--paletton-7)';
+    } else {
+        body.style.maxHeight = '2000px';
+        chevron.style.transform = 'rotate(180deg)';
+        header.style.background = 'var(--paletton-6)';
+    }
+}
+
+function updateItineraryDays() {
+    var select = document.getElementById('itinerary_days_count');
+    if (!select) return;
+    var count = parseInt(select.value);
+    
+    for (var day = 1; day <= 15; day++) {
+        var wrapper = document.getElementById('day-wrapper-' + day);
+        if (!wrapper) continue;
+        
+        var inputs = wrapper.querySelectorAll('input, textarea');
+        
+        if (day <= count) {
+            wrapper.style.display = 'block';
+            inputs.forEach(function(input) {
+                input.disabled = false;
+            });
+        } else {
+            wrapper.style.display = 'none';
+            inputs.forEach(function(input) {
+                input.disabled = true;
+            });
+        }
+    }
+}
+
 function deleteRequest(id) {
     if (!confirm('Are you sure you want to delete this request?')) return;
 

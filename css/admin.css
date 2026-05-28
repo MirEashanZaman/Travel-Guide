@@ -185,3 +185,75 @@
 .card-margin-bottom {
     margin-bottom: 20px;
 }
+
+/* Edit Post Modal Form & Layout Styling */
+.edit-modal-content .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.edit-modal-content .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.edit-modal-content .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+
+.edit-modal-content .field input,
+.edit-modal-content .field select,
+.edit-modal-content .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.edit-modal-content .field input:focus,
+.edit-modal-content .field select:focus,
+.edit-modal-content .field textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--paletton-5);
+}
+
+.edit-modal-content .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+}
+
+.edit-modal-content textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.edit-modal-content .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.edit-modal-content .modal-actions .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+}

@@ -57,11 +57,16 @@
                         <p><strong>Genre:</strong> <?= htmlspecialchars($post['genre']) ?></p>
                         <div class="card-footer">
                             <?php 
-                                $vMap = ['low' => '$500', 'medium' => '$1500', 'high' => '$3000'];
-                                $v = $vMap[strtolower($post['cost_level'])] ?? '';
+                                $baseCost = $post['base_cost'] ?? null;
+                                if ($baseCost !== null) {
+                                    $budgetDisplay = '$' . number_format(floatval($baseCost));
+                                } else {
+                                    $fallback = ['low' => 'Budget', 'medium' => 'Mid-Range', 'high' => 'Luxury'];
+                                    $budgetDisplay = $fallback[strtolower($post['cost_level'])] ?? 'Mid-Range';
+                                }
                             ?>
                             <span class="cost-badge <?= strtolower($post['cost_level']) ?>">
-                                <?= ucfirst($post['cost_level']) ?> (<?= $v ?>)
+                                <?= $budgetDisplay ?>
                             </span>
                             <a href="index.php?page=user&action=detail&id=<?= $post['id'] ?>" class="btn btn-ghost">Read More</a>
                         </div>
