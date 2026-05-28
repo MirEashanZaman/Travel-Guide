@@ -1,7 +1,7 @@
 <?php
 function profileCtrl($conn) {
     $userId = $_SESSION['user']['id'];
-    $error = $success = '';
+    $error = '';
     $action = $_GET['action'] ?? 'view';
 
     //Update Profile Info (Name, Email)
@@ -15,6 +15,9 @@ function profileCtrl($conn) {
             $error = 'Email already taken';
         } else {
             if (updateUserInfo($conn, $userId, $name, $email)) {
+                $_SESSION['user']['name'] = $name;
+                $_SESSION['user']['email'] = $email;
+                $_SESSION['name'] = $name;
                 header("Location: index.php?page=profile&msg=updated");
                 exit;
             }

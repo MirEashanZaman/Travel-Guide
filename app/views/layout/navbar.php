@@ -18,6 +18,7 @@
                 <?php elseif ($_SESSION['user']['role'] === 'user'): ?>
                     <a href="index.php?page=user">Explore</a>
                     <a href="index.php?page=wishlist">Wishlist</a>
+                    <a href="index.php?page=my_travels">My Travels</a>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -35,7 +36,7 @@
                         <span class="user-role"><?= ucfirst($_SESSION['user']['role']) ?></span>
                     </span>
                 </a>
-                <a href="index.php?page=logout" class="btn-logout">Logout</a>
+                <a href="index.php?page=logout" class="btn-logout" onclick="return confirm('Are you sure you want to logout?');">Logout</a>
             <?php else: ?>
                 <a href="index.php?page=login" class="btn btn-ghost">Login</a>
                 <a href="index.php?page=registration" class="btn btn-primary">Join Now</a>

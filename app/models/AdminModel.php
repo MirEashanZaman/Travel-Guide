@@ -98,6 +98,62 @@ function approvePostRequest($conn, $requestId) {
     mysqli_stmt_close($stmt);
 
     if ($ok) {
+        // Determine post ID
+        $postId = $originalPostId ? $originalPostId : mysqli_insert_id($conn);
+
+        // Determine cost from data
+        if (!isset($data['expected_cost'])) {
+            $mapping = ['low' => 500, 'medium' => 1500, 'high' => 3000];
+            $expectedCost = $mapping[strtolower($data['cost_level'] ?? 'medium')] ?? 1500;
+        } else {
+            $expectedCost = floatval($data['expected_cost']);
+        }
+
+        // Insert or update in cost_estimates table
+        $checkEst = mysqli_prepare($conn, "SELECT id FROM cost_estimates WHERE post_id = ?");
+        mysqli_stmt_bind_param($checkEst, 'i', $postId);
+        mysqli_stmt_execute($checkEst);
+        $res = mysqli_stmt_get_result($checkEst);
+        $exists = mysqli_fetch_assoc($res);
+        mysqli_stmt_close($checkEst);
+
+        if ($exists) {
+            $upEst = mysqli_prepare($conn, "UPDATE cost_estimates SET base_cost = ? WHERE post_id = ?");
+            mysqli_stmt_bind_param($upEst, 'di', $expectedCost, $postId);
+            mysqli_stmt_execute($upEst);
+            mysqli_stmt_close($upEst);
+        } else {
+            $insEst = mysqli_prepare($conn, "INSERT INTO cost_estimates (post_id, base_cost) VALUES (?, ?)");
+            mysqli_stmt_bind_param($insEst, 'id', $postId, $expectedCost);
+            mysqli_stmt_execute($insEst);
+            mysqli_stmt_close($insEst);
+        }
+
+        // Insert or update in itinerary_items table
+        if (isset($data['itinerary']) && is_array($data['itinerary'])) {
+            // Delete existing itinerary items first
+            $delItin = mysqli_prepare($conn, "DELETE FROM itinerary_items WHERE post_id = ?");
+            mysqli_stmt_bind_param($delItin, 'i', $postId);
+            mysqli_stmt_execute($delItin);
+            mysqli_stmt_close($delItin);
+
+            // Insert new ones
+            $insItin = mysqli_prepare($conn, "INSERT INTO itinerary_items (post_id, day_number, time_of_day, activity_title, activity_description, estimated_cost) VALUES (?, ?, ?, ?, ?, ?)");
+            foreach ($data['itinerary'] as $item) {
+                $day = intval($item['day_number']);
+                $time = trim($item['time_of_day']);
+                $actTitle = trim($item['activity_title']);
+                $actDesc = trim($item['activity_description'] ?? '');
+                $cost = floatval($item['estimated_cost'] ?? 0.00);
+                
+                if ($actTitle !== '') {
+                    mysqli_stmt_bind_param($insItin, 'iisssd', $postId, $day, $time, $actTitle, $actDesc, $cost);
+                    mysqli_stmt_execute($insItin);
+                }
+            }
+            mysqli_stmt_close($insItin);
+        }
+
         //Mark the request as approved so it doesn't show in pending list
         $stmt = mysqli_prepare($conn, "UPDATE post_requests SET status = 'approved' WHERE id = ?");
         mysqli_stmt_bind_param($stmt, 'i', $requestId);
@@ -139,7 +195,7 @@ function deleteCommentByAdmin($conn, $commentId) {
 
 //Global Post Management
 function getAllPostsAdmin($conn) {
-    $r = mysqli_query($conn, "SELECT * FROM posts ORDER BY created_at DESC");
+    $r = mysqli_query($conn, "SELECT posts.*, cost_estimates.base_cost FROM posts LEFT JOIN cost_estimates ON posts.id = cost_estimates.post_id ORDER BY posts.created_at DESC");
     return mysqli_fetch_all($r, MYSQLI_ASSOC);
 }
 
@@ -166,6 +222,29 @@ function updatePostAdmin($conn, $postId, $data) {
     );
     $ok = mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
+    if ($ok && isset($data['base_cost'])) {
+        $baseCost = floatval($data['base_cost']);
+        
+        $checkEst = mysqli_prepare($conn, "SELECT id FROM cost_estimates WHERE post_id = ?");
+        mysqli_stmt_bind_param($checkEst, 'i', $postId);
+        mysqli_stmt_execute($checkEst);
+        $res = mysqli_stmt_get_result($checkEst);
+        $exists = mysqli_fetch_assoc($res);
+        mysqli_stmt_close($checkEst);
+
+        if ($exists) {
+            $upEst = mysqli_prepare($conn, "UPDATE cost_estimates SET base_cost = ? WHERE post_id = ?");
+            mysqli_stmt_bind_param($upEst, 'di', $baseCost, $postId);
+            mysqli_stmt_execute($upEst);
+            mysqli_stmt_close($upEst);
+        } else {
+            $insEst = mysqli_prepare($conn, "INSERT INTO cost_estimates (post_id, base_cost) VALUES (?, ?)");
+            mysqli_stmt_bind_param($insEst, 'id', $postId, $baseCost);
+            mysqli_stmt_execute($insEst);
+            mysqli_stmt_close($insEst);
+        }
+    }
     return $ok;
 }
 

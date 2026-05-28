@@ -35,14 +35,41 @@ function scoutCtrl($conn) {
             }
 
             if (empty($error)) {
+                $expected_cost = floatval($_POST['expected_cost'] ?? 1500);
+                $derived_cost_level = ($expected_cost < 1000) ? 'low' : (($expected_cost <= 2500) ? 'medium' : 'high');
+
+                // Parse itinerary items
+                $itinerary_data = [];
+                if (isset($_POST['itinerary']) && is_array($_POST['itinerary'])) {
+                    foreach ($_POST['itinerary'] as $dayNum => $times) {
+                        foreach ($times as $timeOfDay => $fields) {
+                            $title = trim($fields['activity_title'] ?? '');
+                            $desc = trim($fields['activity_description'] ?? '');
+                            $cost = floatval($fields['estimated_cost'] ?? 0.00);
+                            
+                            if ($title !== '') {
+                                $itinerary_data[] = [
+                                    'day_number' => intval($dayNum),
+                                    'time_of_day' => $timeOfDay,
+                                    'activity_title' => $title,
+                                    'activity_description' => $desc,
+                                    'estimated_cost' => $cost
+                                ];
+                            }
+                        }
+                    }
+                }
+
                 $data = [
                     'title' => trim($_POST['title'] ?? ''),
                     'country' => trim($_POST['country'] ?? ''),
                     'short_history' => trim($_POST['short_history'] ?? ''),
                     'genre' => trim($_POST['genre'] ?? ''),
-                    'cost_level' => trim($_POST['cost_level'] ?? ''),
+                    'expected_cost' => $expected_cost,
+                    'cost_level' => $derived_cost_level,
                     'travel_medium_info' => trim($_POST['travel_medium_info'] ?? ''),
-                    'image' => $image_path
+                    'image' => $image_path,
+                    'itinerary' => $itinerary_data
                 ];
 
                 if (empty($data['title']) || empty($data['country'])) {
@@ -88,14 +115,41 @@ function scoutCtrl($conn) {
                 }
 
                 if (empty($error)) {
+                    $expected_cost = floatval($_POST['expected_cost'] ?? 1500);
+                    $derived_cost_level = ($expected_cost < 1000) ? 'low' : (($expected_cost <= 2500) ? 'medium' : 'high');
+
+                    // Parse itinerary items
+                    $itinerary_data = [];
+                    if (isset($_POST['itinerary']) && is_array($_POST['itinerary'])) {
+                        foreach ($_POST['itinerary'] as $dayNum => $times) {
+                            foreach ($times as $timeOfDay => $fields) {
+                                $title = trim($fields['activity_title'] ?? '');
+                                $desc = trim($fields['activity_description'] ?? '');
+                                $cost = floatval($fields['estimated_cost'] ?? 0.00);
+                                
+                                if ($title !== '') {
+                                    $itinerary_data[] = [
+                                        'day_number' => intval($dayNum),
+                                        'time_of_day' => $timeOfDay,
+                                        'activity_title' => $title,
+                                        'activity_description' => $desc,
+                                        'estimated_cost' => $cost
+                                    ];
+                                }
+                            }
+                        }
+                    }
+
                     $data = [
                         'title' => trim($_POST['title'] ?? ''),
                         'country' => trim($_POST['country'] ?? ''),
                         'short_history' => trim($_POST['short_history'] ?? ''),
                         'genre' => trim($_POST['genre'] ?? ''),
-                        'cost_level' => trim($_POST['cost_level'] ?? ''),
+                        'expected_cost' => $expected_cost,
+                        'cost_level' => $derived_cost_level,
                         'travel_medium_info' => trim($_POST['travel_medium_info'] ?? ''),
-                        'image' => $image_path
+                        'image' => $image_path,
+                        'itinerary' => $itinerary_data
                     ];
 
                     if (empty($data['title']) || empty($data['country'])) {
@@ -158,6 +212,11 @@ function scoutCtrl($conn) {
                 $editing = $post;
                 $editing['original_post_id'] = $postId;
                 unset($editing['id']); 
+                $costEst = getCostEstimate($conn, $postId);
+                $editing['expected_cost'] = $costEst ? floatval($costEst['base_cost']) : 1500;
+                
+                // Fetch the existing itinerary items
+                $editing['itinerary'] = getItinerary($conn, $postId);
             } else {
                 header('Location: index.php?page=scout');
                 exit;

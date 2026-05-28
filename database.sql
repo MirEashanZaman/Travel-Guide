@@ -87,3 +87,14 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS itinerary_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    day_number INT NOT NULL,
+    time_of_day ENUM('morning', 'afternoon', 'evening') NOT NULL,
+    activity_title VARCHAR(200) NOT NULL,
+    activity_description TEXT,
+    estimated_cost DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

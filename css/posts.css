@@ -1,3 +1,158 @@
+/* ── Leaflet Map Layout & Stacking ── */
+#mapWrapper {
+    position: relative;
+    z-index: 1; /* Creates a local stacking context to contain Leaflet's layers */
+    margin-bottom: 25px;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+#leafletMap {
+    height: 400px;
+    width: 100%;
+}
+
+.map-controls-bar {
+    position: relative;
+    z-index: 2;
+    padding: 15px;
+    margin-bottom: 0;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.map-controls-bar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.map-controls-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-controls-title-icon {
+    font-size: 20px;
+}
+
+.map-controls-title-text {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-main);
+}
+
+.map-controls-badge-count {
+    background: var(--paletton-3);
+    color: white;
+}
+
+.map-controls-action-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.map-controls-near-me-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.map-controls-near-me-label {
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: var(--paletton-6);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    user-select: none;
+    color: var(--text-main);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(19, 21, 59, 0.05);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.map-controls-near-me-label:hover {
+    background: var(--paletton-5);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(19, 21, 59, 0.12);
+}
+
+/* Custom styled accent and checked state using :has() */
+.map-controls-near-me-label input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--primary);
+    margin: 0;
+    width: 15px;
+    height: 15px;
+    transition: all 0.2s ease;
+}
+
+.map-controls-near-me-label:has(input:checked) {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(19, 21, 59, 0.25);
+}
+
+.map-controls-near-me-label:has(input:checked) input[type="checkbox"] {
+    accent-color: var(--white);
+}
+
+.map-controls-radius-select {
+    width: auto;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 15px;
+    background: var(--paletton-7);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.map-controls-radius-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--paletton-5);
+}
+
+.map-controls-radius-select:disabled {
+    opacity: 0.5;
+    background: var(--paletton-5);
+    border-color: var(--border-color);
+    cursor: not-allowed;
+}
+
+.map-controls-toggle-btn {
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.map-controls-toggle-btn:hover {
+    background: var(--paletton-5);
+    transform: translateY(-1px);
+}
+
 .card-toolbar {
     display: flex;
     justify-content: space-between;
@@ -138,9 +293,71 @@
 }
 
 .post-card h3 {
-    margin: 0 0 10px 0;
+    margin: 0;
     font-size: 18px;
     color: var(--text-main);
+}
+
+.post-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.post-card-header h3 {
+    flex: 1;
+}
+
+.wishlist-card-btn {
+    background: var(--paletton-6);
+    color: var(--paletton-1);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.wishlist-card-btn:hover {
+    transform: scale(1.05);
+    background: var(--paletton-5);
+    border-color: var(--paletton-4);
+}
+
+.wishlist-card-btn .heart-icon::before {
+    content: "🤍";
+}
+
+.wishlist-card-btn.wishlisted {
+    background: var(--paletton-1);
+    color: var(--paletton-7);
+    border-color: var(--paletton-2);
+}
+
+.wishlist-card-btn.wishlisted .heart-icon::before {
+    content: "❤️";
+}
+
+.wishlist-card-btn.wishlisted:hover {
+    background: #c0392b;
+    border-color: #962d22;
+    color: #ffffff;
+}
+
+.wishlist-card-btn.wishlisted:hover .heart-icon::before {
+    content: "💔";
 }
 
 .post-card .post-meta {
@@ -302,3 +519,242 @@
     width: 100%; 
     text-align: center;
 }
+
+/* Cost Calculator Styling */
+.cost-calc-wrap .calc-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: var(--paletton-6);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.cost-calc-wrap .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.cost-calc-wrap .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-right: 0;
+    width: auto;
+}
+.cost-calc-wrap .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+.calc-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--text-main);
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    height: 40px;
+    box-sizing: border-box;
+}
+.calc-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--paletton-5);
+}
+
+/* ================================================================
+   INTERACTIVE TRAVEL TIMELINE & ACCORDION SYSTEM
+   ================================================================ */
+.timeline-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.timeline-day-header {
+    background: var(--paletton-7);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(19, 21, 59, 0.05);
+}
+
+.timeline-day-header:hover {
+    background: var(--paletton-6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(19, 21, 59, 0.12);
+}
+
+.timeline-day-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeline-day-header .chevron {
+    font-size: 18px;
+    color: var(--primary);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Open Accordion Header Animation */
+.timeline-day-header.active-header {
+    background: var(--paletton-6);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.timeline-day-header.active-header .chevron {
+    transform: rotate(180deg);
+}
+
+/* Collapsible Content Area */
+.timeline-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    padding: 0 20px;
+    position: relative;
+    border-left: 2px solid var(--border-color);
+    margin-left: 35px;
+    margin-top: -16px;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.4);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.timeline-content.active {
+    max-height: 2000px; /* Big enough to fit rich items */
+    padding: 25px 20px 20px 30px;
+    overflow: visible;
+}
+
+/* Timeline Items list */
+.timeline-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Glowing Left Bullet Connector */
+.timeline-icon {
+    position: absolute;
+    left: -48px;
+    top: 2px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 4px var(--paletton-7), 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    z-index: 2;
+    transition: transform 0.2s ease;
+}
+
+.timeline-item:hover .timeline-icon {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px var(--paletton-5), 0 3px 8px rgba(19,21,59,0.2);
+}
+
+.timeline-icon.morning { border-color: #f39c12; }
+.timeline-icon.afternoon { border-color: #e67e22; }
+.timeline-icon.evening { border-color: #9b59b6; }
+
+/* Timeline Body Details */
+.timeline-details {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.timeline-item:hover .timeline-details {
+    transform: translateX(4px);
+    box-shadow: 0 6px 15px -2px rgba(19, 21, 59, 0.15);
+}
+
+.timeline-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 6px;
+}
+
+.timeline-details h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.timeline-details p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.itinerary-time-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+}
+
+.itinerary-time-tag.morning { background: #f39c12; }
+.itinerary-time-tag.afternoon { background: #e67e22; }
+.itinerary-time-tag.evening { background: #9b59b6; }
+
+.itinerary-cost-badge {
+    font-size: 11px;
+    background: var(--paletton-7);
+    color: var(--paletton-1);
+    border: 1px solid var(--border-color);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
