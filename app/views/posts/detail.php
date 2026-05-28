@@ -193,6 +193,26 @@ $isGeneralUser = ($user['role'] === 'user' && $user['is_verified'] == 1);
         </div>
     </div>
 
+    <div class="card packing-assistant-card">
+        <h3 class="card-title">&#129523; Dynamic Travel Packing Assistant</h3>
+        <p class="page-sub" style="margin-top: -10px; margin-bottom: 20px; font-size: 13.5px;">Customized automatically based on your destination's <strong><?= ucfirst(htmlspecialchars($post['genre'])) ?></strong> genre and your selected trip duration!</p>
+        
+        <div class="packing-assistant-wrap" style="background: var(--paletton-6); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 12px; margin-bottom: 15px;">
+                <span style="font-weight: 700; font-size: 14px; color: var(--text-main);">🎒 Your Recommended packing checklist:</span>
+                <span class="badge" id="packing_tier_badge" style="font-size: 11px; font-weight: 700; background: var(--primary); color: white;">Weekender Pack</span>
+            </div>
+            
+            <div id="packingListContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                <span class="muted" id="packing_progress_text">0 of 0 items packed</span>
+                <button class="btn-sm btn-ghost" onclick="resetPackingChecklist()" style="font-size: 11px; font-weight: 600; padding: 4px 10px;">Reset List</button>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <h3 class="card-title">&#128172; Traveler Comments</h3>
         
@@ -278,12 +298,198 @@ function updateCost() {
 
     var total = (baseCost * people * days) / 7;
     totalDisplay.innerHTML = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    
+    if (typeof generatePackingChecklist === 'function') {
+        generatePackingChecklist();
+    }
 }
 
 if (calcPeople && calcDays) {
     calcPeople.addEventListener('input', updateCost);
     calcDays.addEventListener('input', updateCost);
 }
+
+var genre = <?= json_encode(strtolower($post['genre'])) ?>;
+
+var genreItems = {
+    'beach': [
+        { name: '👙 Swimwear & Beach clothes', desc: 'Light and quick-dry apparel' },
+        { name: '🧴 Sunscreen (SPF 50+)', desc: 'Water-resistant protection' },
+        { name: '🕶️ Polarized Sunglasses', desc: 'Protects eyes from sea glare' },
+        { name: '🩴 Waterproof Sandals/Sand shoes', desc: 'For walking on hot sand' },
+        { name: '👒 Wide-brimmed Sun Hat', desc: 'Keeps face shaded' },
+        { name: '🏖️ Compact Microfiber Beach Towel', desc: 'Highly absorbent, fast-drying' }
+    ],
+    'mountain': [
+        { name: '🧥 Heavy Windproof/Warm Jacket', desc: 'Temps drop fast at higher altitudes' },
+        { name: '🥾 Sturdy Waterproof Hiking Boots', desc: 'Ankle support for rugged trails' },
+        { name: '🦯 Telescopic Trekking Poles', desc: 'Reduces impact on knees and back' },
+        { name: '🧴 Insect Repellent (DEET 30%+)', desc: 'Guards against ticks & mosquitos' },
+        { name: '🔦 Reliable headlamp / Flashlight', desc: 'For early starts or delayed returns' },
+        { name: '💧 Insulated Thermal Water Flask', desc: 'Keeps beverages warm or cold' }
+    ],
+    'city': [
+        { name: '👟 Comfortable Walking Sneakers', desc: 'Essential for exploring city streets' },
+        { name: '🔋 High-capacity Power Bank', desc: 'Keeps phone charged for maps & photos' },
+        { name: '🌂 Compact Pocket Umbrella', desc: 'Prepares for sudden metropolitan showers' },
+        { name: '🎒 Lightweight Theft-proof Daypack', desc: 'Securely holds daily essentials' },
+        { name: '📸 Camera / Lens wipes', desc: 'For capturing monuments clearly' },
+        { name: '💳 Cardholders & Cash stash', desc: 'Quick contactless metro & shop payments' }
+    ],
+    'historical': [
+        { name: '🧣 Cultural Shawl / Light Scarf', desc: 'For covering shoulders/knees at holy sites' },
+        { name: '🥿 Comfortable Slip-on Shoes', desc: 'Easy off/on at temples and shrines' },
+        { name: '📓 Small Travel Journal & Pen', desc: 'For sketching or noting guide stories' },
+        { name: '🧴 Sun Hat & Sunscreen protection', desc: 'Many ruins have little to no shade' },
+        { name: '🕶️ Anti-reflective Sunglasses', desc: 'For reading signs in bright sun' },
+        { name: '🗺️ Historical Map / Audio guide app', desc: 'Enriches walking tours around ruins' }
+    ],
+    'nature': [
+        { name: '🔭 Compact Travel Binoculars', desc: 'For viewing birds and wildlife closely' },
+        { name: '🧴 Insect Repellent & Mosquito Spray', desc: 'Must-have for deep woods and reserves' },
+        { name: '🥾 Sturdy Trail Boots', desc: 'Traction on muddy forest paths' },
+        { name: '🧥 Waterproof Rain Poncho', desc: 'Folds tiny, protects from storms' },
+        { name: '🩹 Outdoor First-Aid kit', desc: 'Bandages, antiseptic wipes, blister pads' },
+        { name: '🔦 Flashlight & Extra batteries', desc: 'Safe navigating through forest trails' }
+    ]
+};
+
+var baseUniversalItems = [
+    { name: '🔌 Universal Power Adapter', desc: 'Fits local plug configurations' },
+    { name: '👝 Passport Wallet & Travel docs', desc: 'Keeps identity papers safe' },
+    { name: '🧼 Travel-sized Toiletries Kit', desc: 'Shampoo, toothpaste, toothbrushes' },
+    { name: '💊 Personal Medical kit', desc: 'Painkillers, allergy pills, prescriptions' }
+];
+
+function generatePackingChecklist() {
+    var calcDaysInput = document.getElementById('calc_days');
+    var days = calcDaysInput ? Math.max(1, parseInt(calcDaysInput.value) || 7) : 7;
+    
+    var container = document.getElementById('packingListContainer');
+    var tierBadge = document.getElementById('packing_tier_badge');
+    if (!container) return;
+    
+    var quantityText = '';
+    var multiplier = 1;
+    var luggageTier = 'Weekender Pack';
+    
+    if (days <= 3) {
+        luggageTier = 'Weekender Pack';
+        multiplier = 3;
+        quantityText = '3x pairs of ';
+    } else if (days <= 7) {
+        luggageTier = 'Standard Explorer Pack';
+        multiplier = 7;
+        quantityText = '7x pairs of ';
+    } else {
+        luggageTier = 'Grand Voyager Pack';
+        multiplier = 10;
+        quantityText = '10x pairs of ';
+    }
+    
+    if (tierBadge) {
+        tierBadge.textContent = luggageTier;
+    }
+    
+    var list = [];
+    
+    list.push({
+        name: '🧦 ' + quantityText + 'Socks & Underwear',
+        desc: 'Sized perfectly for your ' + days + '-day journey'
+    });
+    
+    var genreSpecific = genreItems[genre] || genreItems['city'];
+    genreSpecific.forEach(function(item) {
+        list.push(item);
+    });
+    
+    baseUniversalItems.forEach(function(item) {
+        list.push(item);
+    });
+    
+    container.innerHTML = '';
+    
+    var storageKey = 'packed_list_post_' + <?= intval($post['id']) ?>;
+    var packedStates = {};
+    try {
+        packedStates = JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch(e) {
+        packedStates = {};
+    }
+    
+    list.forEach(function(item, index) {
+        var isChecked = packedStates[item.name] ? 'checked' : '';
+        
+        var html = 
+            '<div class="packing-item" style="background: var(--white); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 15px; display: flex; align-items: flex-start; gap: 10px; transition: transform 0.2s, opacity 0.2s; ' + (isChecked ? 'opacity: 0.75;' : '') + '">' +
+                '<input type="checkbox" class="packing-checkbox" onchange="togglePackingItem(this, \'' + item.name.replace(/'/g, "\\'") + '\')" ' + isChecked + ' style="margin-top: 3px; cursor: pointer; accent-color: var(--primary);">' +
+                '<div style="flex: 1;">' +
+                    '<label style="display: block; font-size: 13.5px; font-weight: 700; color: var(--text-main); margin: 0; text-decoration: ' + (isChecked ? 'line-through' : 'none') + ';">' + item.name + '</label>' +
+                    '<small style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;">' + item.desc + '</small>' +
+                '</div>' +
+            '</div>';
+            
+        container.insertAdjacentHTML('beforeend', html);
+    });
+    
+    updatePackingProgress();
+}
+
+function togglePackingItem(checkbox, name) {
+    var parent = checkbox.closest('.packing-item');
+    var label = parent ? parent.querySelector('label') : null;
+    
+    if (checkbox.checked) {
+        if (parent) parent.style.opacity = '0.75';
+        if (label) label.style.textDecoration = 'line-through';
+    } else {
+        if (parent) parent.style.opacity = '1';
+        if (label) label.style.textDecoration = 'none';
+    }
+    
+    var storageKey = 'packed_list_post_' + <?= intval($post['id']) ?>;
+    var packedStates = {};
+    try {
+        packedStates = JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch(e) {
+        packedStates = {};
+    }
+    
+    packedStates[name] = checkbox.checked;
+    localStorage.setItem(storageKey, JSON.stringify(packedStates));
+    
+    updatePackingProgress();
+}
+
+function updatePackingProgress() {
+    var container = document.getElementById('packingListContainer');
+    if (!container) return;
+    
+    var checkboxes = container.querySelectorAll('.packing-checkbox');
+    var total = checkboxes.length;
+    var checked = 0;
+    checkboxes.forEach(function(cb) {
+        if (cb.checked) checked++;
+    });
+    
+    var progressText = document.getElementById('packing_progress_text');
+    if (progressText) {
+        progressText.innerHTML = '<strong>' + checked + '</strong> of <strong>' + total + '</strong> items packed';
+    }
+}
+
+function resetPackingChecklist() {
+    if (!confirm('Reset your packing checklist?')) return;
+    
+    var storageKey = 'packed_list_post_' + <?= intval($post['id']) ?>;
+    localStorage.removeItem(storageKey);
+    
+    generatePackingChecklist();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    generatePackingChecklist();
+});
 
 function toggleWishlist(postId) {
     var btn = document.getElementById('wishlistBtn');
