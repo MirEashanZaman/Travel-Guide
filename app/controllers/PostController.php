@@ -77,7 +77,7 @@ function postCtrl($conn) {
         $comments = getComments($conn, $id);
         $costInfo = getCostEstimate($conn, $id);
         
-        // Fallback mapping if no estimate exists
+        //Fallback mapping if no estimate exists
         if (!$costInfo) {
             $mapping = ['low' => 500, 'medium' => 1500, 'high' => 3000];
             $costInfo = ['base_cost' => $mapping[strtolower($post['cost_level'])] ?? 1500];
@@ -89,7 +89,7 @@ function postCtrl($conn) {
             $hasBooked = hasUserBookedPost($conn, $_SESSION['user']['id'], $id);
         }
 
-        // Fetch daily itinerary plan (with automatic seeding if empty)
+        //Fetch daily itinerary plan
         $itinerary = getItinerary($conn, $id);
         if (empty($itinerary)) {
             seedDefaultItinerary($conn, $id);
@@ -108,5 +108,29 @@ function postCtrl($conn) {
         $wishlistIds = getUserWishlistPostIds($conn, $_SESSION['user']['id']);
     }
     require 'app/views/posts/browse.php'; 
+}
+
+function printBrochureCtrl($conn) {
+    $id = intval($_GET['id'] ?? 0);
+    $post = getPost($conn, $id);
+
+    if (!$post) {
+        header('Location: index.php?page=user');
+        exit;
+    }
+
+    $itinerary = getItinerary($conn, $id);
+    if (empty($itinerary)) {
+        seedDefaultItinerary($conn, $id);
+        $itinerary = getItinerary($conn, $id);
+    }
+
+    $phrases = getLocalPhrases($conn, $id);
+    if (empty($phrases)) {
+        seedDefaultLocalPhrases($conn, $id);
+        $phrases = getLocalPhrases($conn, $id);
+    }
+
+    require 'app/views/posts/print_brochure.php';
 }
 ?>
