@@ -98,3 +98,13 @@ CREATE TABLE IF NOT EXISTS itinerary_items (
     estimated_cost DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS local_phrases (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    phrase_no INT NOT NULL,
+    original_phrase VARCHAR(255) NOT NULL,
+    translation VARCHAR(255) NOT NULL,
+    phonetic VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
