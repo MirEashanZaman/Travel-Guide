@@ -118,7 +118,7 @@ function scoutCtrl($conn) {
                     $expected_cost = floatval($_POST['expected_cost'] ?? 1500);
                     $derived_cost_level = ($expected_cost < 1000) ? 'low' : (($expected_cost <= 2500) ? 'medium' : 'high');
 
-                    // Parse itinerary items
+                    //Parse itinerary items
                     $itinerary_data = [];
                     if (isset($_POST['itinerary']) && is_array($_POST['itinerary'])) {
                         foreach ($_POST['itinerary'] as $dayNum => $times) {
@@ -215,7 +215,7 @@ function scoutCtrl($conn) {
                 $costEst = getCostEstimate($conn, $postId);
                 $editing['expected_cost'] = $costEst ? floatval($costEst['base_cost']) : 1500;
                 
-                // Fetch the existing itinerary items
+                //Fetch the existing itinerary items
                 $editing['itinerary'] = getItinerary($conn, $postId);
             } else {
                 header('Location: index.php?page=scout');
