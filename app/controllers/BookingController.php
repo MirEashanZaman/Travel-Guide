@@ -13,7 +13,7 @@ function bookingCtrl($conn) {
 
     if ($action === 'confirm') {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Process payment and confirmation
+            //Payment process
             $postId        = intval($_POST['post_id'] ?? 0);
             $travelers     = max(1, intval($_POST['travelers'] ?? 1));
             $days          = max(1, intval($_POST['days'] ?? 7));
@@ -25,7 +25,7 @@ function bookingCtrl($conn) {
             if ($postId <= 0 || empty($travelDate) || empty($billingName) || empty($billingEmail)) {
                 $error = 'All fields (billing name, email, and travel date) are required.';
             } else {
-                // Fetch destination details
+                //Fetch destination details
                 $post = getPost($conn, $postId);
                 if (!$post) {
                     $error = 'Invalid destination selected.';
@@ -51,7 +51,7 @@ function bookingCtrl($conn) {
             }
         }
 
-        // Display confirmation form (GET request or validation error)
+        //Display confirmation form (GET request or validation error)
         $postId    = intval($_GET['post_id'] ?? $_POST['post_id'] ?? 0);
         $travelers = max(1, intval($_GET['people'] ?? $_POST['travelers'] ?? 1));
         $days      = max(1, intval($_GET['days'] ?? $_POST['days'] ?? 7));
