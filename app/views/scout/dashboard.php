@@ -2,7 +2,6 @@
 $user = $_SESSION['user']; 
 $isEdit = !empty($editing);
 
-// Indexing helper for itinerary items to pre-populate during edit (max 15 days)
 $itinValues = [];
 for ($day = 1; $day <= 15; $day++) {
     foreach (['morning', 'afternoon', 'evening'] as $time) {
@@ -14,7 +13,7 @@ for ($day = 1; $day <= 15; $day++) {
     }
 }
 
-$maxDay = 3; // Default to 3 days
+$maxDay = 3;
 if ($isEdit && !empty($editing['itinerary']) && is_array($editing['itinerary'])) {
     foreach ($editing['itinerary'] as $item) {
         $day = intval($item['day_number']);
@@ -32,6 +31,27 @@ if ($isEdit && !empty($editing['itinerary']) && is_array($editing['itinerary']))
     }
 }
 $maxDay = min(15, max(1, $maxDay));
+
+$phraseValues = [];
+for ($i = 1; $i <= 5; $i++) {
+    $phraseValues[$i] = [
+        'original_phrase' => '',
+        'translation' => '',
+        'phonetic' => ''
+    ];
+}
+if ($isEdit && !empty($editing['phrases']) && is_array($editing['phrases'])) {
+    foreach ($editing['phrases'] as $p) {
+        $no = intval($p['phrase_no']);
+        if ($no >= 1 && $no <= 5) {
+            $phraseValues[$no] = [
+                'original_phrase' => $p['original_phrase'] ?? '',
+                'translation' => $p['translation'] ?? '',
+                'phonetic' => $p['phonetic'] ?? ''
+            ];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -148,7 +168,7 @@ $maxDay = min(15, max(1, $maxDay));
             <div class="itinerary-section">
                 <div class="itinerary-title-wrap" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
                     <div>
-                        <h3 class="itinerary-main-title">📅 Custom Travel Itinerary <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">(Optional)</span></h3>
+                        <h3 class="itinerary-main-title">Custom Travel Itinerary <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">(Optional)</span></h3>
                         <p class="itinerary-sub-title" style="margin: 0;">Provide daily plans for Morning, Afternoon, and Evening activities (up to 15 days max).</p>
                     </div>
                     <div class="field" style="margin-bottom: 0; width: 180px;">
@@ -168,13 +188,13 @@ $maxDay = min(15, max(1, $maxDay));
                     ?>
                         <div class="itinerary-day-wrapper day-accordion" id="day-wrapper-<?= $day ?>" style="display: <?= $isActive ? 'block' : 'none' ?>;">
                             <div class="itin-header" onclick="toggleItinDay(<?= $day ?>)" id="itin-header-<?= $day ?>">
-                                <span class="itin-header-title">📅 Day <?= $day ?> Plan</span>
+                                <span class="itin-header-title">Day <?= $day ?> Plan</span>
                                 <span class="itin-chevron" id="itin-chevron-<?= $day ?>" style="transform: <?= ($isOpen && $isActive) ? 'rotate(180deg)' : 'rotate(0deg)' ?>;">&#9662;</span>
                             </div>
                             
                             <div class="itin-body" id="itin-body-<?= $day ?>" style="max-height: <?= ($isOpen && $isActive) ? '2000px' : '0px' ?>;">
                                 <div class="itin-body-content">
-                                    <?php foreach (['morning' => '🌅 Morning', 'afternoon' => '☀️ Afternoon', 'evening' => '🌙 Evening'] as $time => $label): ?>
+                                    <?php foreach (['morning' => 'Morning', 'afternoon' => 'Afternoon', 'evening' => 'Evening'] as $time => $label): ?>
                                         <div class="time-block <?= $time ?>">
                                             <h4 class="time-block-title"><?= $label ?></h4>
                                             
@@ -203,6 +223,35 @@ $maxDay = min(15, max(1, $maxDay));
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endfor; ?>
+                </div>
+            </div>
+
+            <div class="phrasebook-section" style="margin-top: 30px; border-top: 1px dashed var(--border-color); padding-top: 25px;">
+                <h3 class="itinerary-main-title">Local Expressions Phrasebook <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">(Optional)</span></h3>
+                <p class="itinerary-sub-title" style="margin: 0 0 20px 0;">Submit up to 5 essential local expressions to help travelers interact with locals!</p>
+                
+                <div class="phrases-list" style="display: flex; flex-direction: column; gap: 15px;">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <div class="phrase-row" style="background: var(--paletton-6); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="font-weight: 700; font-size: 13px; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                                <span>Expression #<?= $i ?></span>
+                            </div>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label style="font-size: 11px;">Original Phrase</label>
+                                    <input type="text" name="phrases[<?= $i ?>][original]" value="<?= htmlspecialchars($phraseValues[$i]['original_phrase']) ?>" placeholder="e.g. Bonjour" style="height: 38px;">
+                                </div>
+                                <div class="field">
+                                    <label style="font-size: 11px;">English Translation</label>
+                                    <input type="text" name="phrases[<?= $i ?>][translation]" value="<?= htmlspecialchars($phraseValues[$i]['translation']) ?>" placeholder="e.g. Hello" style="height: 38px;">
+                                </div>
+                                <div class="field">
+                                    <label style="font-size: 11px;">Phonetic Pronunciation</label>
+                                    <input type="text" name="phrases[<?= $i ?>][phonetic]" value="<?= htmlspecialchars($phraseValues[$i]['phonetic']) ?>" placeholder="e.g. bohn-zhoor" style="height: 38px;">
                                 </div>
                             </div>
                         </div>
