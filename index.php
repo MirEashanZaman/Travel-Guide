@@ -130,6 +130,7 @@ switch ($page) {
     case 'booking':  bookingCtrl($conn);  break;
     case 'booking_success': bookingSuccessCtrl($conn); break;
     case 'my_travels':  myTravelsCtrl($conn);  break;
+    case 'print_brochure': printBrochureCtrl($conn); break;
     default:
         header('Location: index.php?page=home');
         exit;
