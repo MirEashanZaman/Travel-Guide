@@ -39,7 +39,7 @@ $user = $_SESSION['user'];
             <div class="field filter-field-grow">
                 <label>Search Destination</label>
                 <div class="search-wrap filter-search-wrap">
-                    <span class="search-icon">&#128269;</span>
+                    <span class="search-icon"></span>
                     <input type="text" id="searchInput" class="search-input" placeholder="Name or country...">
                 </div>
             </div>
@@ -79,14 +79,14 @@ $user = $_SESSION['user'];
     <div class="card map-controls-bar">
         <div class="map-controls-bar-inner">
             <div class="map-controls-title-group">
-                <span class="map-controls-title-icon">🗺️</span>
+                <span class="map-controls-title-icon"></span>
                 <h3 class="map-controls-title-text">Interactive Destination Map</h3>
                 <span class="badge map-controls-badge-count" id="mapCount">0 markers shown</span>
             </div>
             <div class="map-controls-action-group">
                 <div class="map-controls-near-me-wrap">
                     <label class="map-controls-near-me-label">
-                        <input type="checkbox" id="nearMeCheck" onchange="var rad = document.getElementById('nearMeRadius'); if (rad) rad.disabled = !this.checked; if (window.handleNearMeToggle) window.handleNearMeToggle(this);"> 📍 Near Me
+                        <input type="checkbox" id="nearMeCheck" onchange="var rad = document.getElementById('nearMeRadius'); if (rad) rad.disabled = !this.checked; if (window.handleNearMeToggle) window.handleNearMeToggle(this);"> Near Me
                     </label>
                     <select id="nearMeRadius" class="calc-input map-controls-radius-select" onchange="if (window.handleNearMeRadiusChange) window.handleNearMeRadiusChange(this);" disabled>
                         <option value="500">within 500 km</option>
@@ -129,11 +129,12 @@ $user = $_SESSION['user'];
                                 $tierText = '$' . number_format(floatval($baseCost));
                             } else {
                                 $tierMap = [
-                                    'low' => 'Budget',
-                                    'medium' => 'Mid-Range',
-                                    'high' => 'Luxury'
+                                    'low' => 500,
+                                    'medium' => 1500,
+                                    'high' => 3000
                                 ];
-                                $tierText = $tierMap[strtolower($post['cost_level'])] ?? 'Mid-Range';
+                                $val = $tierMap[strtolower($post['cost_level'])] ?? 1500;
+                                $tierText = '$' . number_format($val);
                             }
                         ?>
                         <span class="cost-badge <?= strtolower($post['cost_level']) ?>"><?= $tierText ?></span>
@@ -144,7 +145,7 @@ $user = $_SESSION['user'];
                     <div class="post-footer" style="display: flex; gap: 10px; width: 100%;">
                         <a class="btn btn-primary" style="flex: 1; text-align: center;" href="index.php?page=user&action=detail&id=<?= $post['id'] ?>">Read More</a>
                         <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'scout' && $_SESSION['user']['id'] == $post['scout_id']): ?>
-                            <a class="btn btn-ghost" style="padding: 0 15px; display: flex; align-items: center; justify-content: center; font-size: 14px;" href="index.php?page=scout&action=request_change&id=<?= $post['id'] ?>" title="Request Edit">✏️ Edit</a>
+                            <a class="btn btn-ghost" style="padding: 0 15px; display: flex; align-items: center; justify-content: center; font-size: 14px;" href="index.php?page=scout&action=request_change&id=<?= $post['id'] ?>" title="Request Edit">Edit</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -289,11 +290,12 @@ $user = $_SESSION['user'];
                 tierText = '$' + Number(parseFloat(r.base_cost)).toLocaleString();
             } else {
                 var tierMap = {
-                    'low': 'Budget',
-                    'medium': 'Mid-Range',
-                    'high': 'Luxury'
+                    'low': 500,
+                    'medium': 1500,
+                    'high': 3000
                 };
-                tierText = tierMap[(r.cost_level || 'medium').toLowerCase()] || 'Mid-Range';
+                var val = tierMap[(r.cost_level || 'medium').toLowerCase()] || 1500;
+                tierText = '$' + Number(val).toLocaleString();
             }
             
             var wishlistBtnHtml = '';
@@ -308,7 +310,7 @@ $user = $_SESSION['user'];
 
             var editBtnHtml = '';
             if (isScout && parseInt(r.scout_id) === currentUserId) {
-                editBtnHtml = '<a class="btn btn-ghost" style="padding: 0 15px; display: flex; align-items: center; justify-content: center; font-size: 14px;" href="index.php?page=scout&action=request_change&id=' + r.id + '" title="Request Edit">✏️ Edit</a>';
+                editBtnHtml = '<a class="btn btn-ghost" style="padding: 0 15px; display: flex; align-items: center; justify-content: center; font-size: 14px;" href="index.php?page=scout&action=request_change&id=' + r.id + '" title="Request Edit">Edit</a>';
             }
 
             html +=

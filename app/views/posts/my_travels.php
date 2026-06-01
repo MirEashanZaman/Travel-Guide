@@ -49,7 +49,7 @@ $user = $_SESSION['user'];
                     <?php if (empty($bookings)): ?>
                         <tr>
                             <td colspan="7" class="empty" style="text-align: center; padding: 40px 20px;">
-                                <div style="font-size: 40px; margin-bottom: 10px;">✈️</div>
+                                <div style="font-size: 40px; margin-bottom: 10px;"></div>
                                 <p style="margin: 0 0 15px 0; font-size: 15px; color: var(--text-muted);">You haven't booked any travel destinations yet!</p>
                                 <a href="index.php?page=user" class="btn btn-primary">Start Planning Your First Trip</a>
                             </td>
@@ -60,7 +60,7 @@ $user = $_SESSION['user'];
                                 <td><?= $i + 1 ?></td>
                                 <td>
                                     <strong style="color: var(--text-main); font-size: 15px; display: block;"><?= htmlspecialchars($book['post_title']) ?></strong>
-                                    <span style="font-size: 12px; color: var(--text-muted);">&#128205; <?= htmlspecialchars($book['post_country']) ?></span>
+                                    <span style="font-size: 12px; color: var(--text-muted);"> <?= htmlspecialchars($book['post_country']) ?></span>
                                 </td>
                                 <td>
                                     <span style="font-weight: 500;"><?= date('M d, Y', strtotime($book['travel_date'])) ?></span>
@@ -77,7 +77,7 @@ $user = $_SESSION['user'];
                                 </td>
                                 <td class="text-right">
                                     <a class="btn-sm btn-edit" style="font-weight: 600; padding: 6px 12px;" href="index.php?page=booking_success&id=<?= $book['id'] ?>">
-                                        📄 View Slip
+                                        View Slip
                                     </a>
                                 </td>
                             </tr>

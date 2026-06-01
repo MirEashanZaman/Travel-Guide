@@ -61,8 +61,9 @@
                                 if ($baseCost !== null) {
                                     $budgetDisplay = '$' . number_format(floatval($baseCost));
                                 } else {
-                                    $fallback = ['low' => 'Budget', 'medium' => 'Mid-Range', 'high' => 'Luxury'];
-                                    $budgetDisplay = $fallback[strtolower($post['cost_level'])] ?? 'Mid-Range';
+                                    $fallback = ['low' => 500, 'medium' => 1500, 'high' => 3000];
+                                    $val = $fallback[strtolower($post['cost_level'])] ?? 1500;
+                                    $budgetDisplay = '$' . number_format($val);
                                 }
                             ?>
                             <span class="cost-badge <?= strtolower($post['cost_level']) ?>">

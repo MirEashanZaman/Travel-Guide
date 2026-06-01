@@ -10,143 +10,7 @@ $imgPath = $post['image_path'] ?? $post['image'] ?? null;
     <title>Confirm Booking &mdash; <?= APP_NAME ?></title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/posts.css">
-    <style>
-        .booking-container {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 30px;
-            margin-top: 20px;
-        }
-        @media (max-width: 900px) {
-            .booking-container {
-                grid-template-columns: 1fr;
-            }
-        }
-        .summary-post-img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-        }
-        .pricing-list {
-            margin: 15px 0;
-            padding: 0;
-            list-style: none;
-        }
-        .pricing-list li {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed var(--border-color);
-            font-size: 14px;
-        }
-        .pricing-list li.grand-total {
-            border-bottom: none;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary);
-            padding-top: 15px;
-        }
-        .payment-method-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .pay-tab {
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            background: var(--paletton-6);
-            transition: all 0.2s;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .pay-tab:hover {
-            border-color: var(--primary);
-        }
-        .pay-tab.active {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--primary);
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(19, 21, 59, 0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(4px);
-        }
-        .modal-box {
-            background: var(--white);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            max-width: 450px;
-            width: 100%;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            animation: modalFadeIn 0.3s ease;
-        }
-        @keyframes modalFadeIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .modal-title {
-            margin-top: 0;
-            font-size: 18px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .modal-box .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-        .modal-box .field label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
-            text-align: left;
-        }
-        .modal-box .calc-input {
-            width: 100% !important;
-            padding: 10px 12px !important;
-            border: 1px solid var(--border-color) !important;
-            border-radius: 6px !important;
-            background: var(--white) !important;
-            color: var(--text-main) !important;
-            outline: none !important;
-            font-size: 14px !important;
-            box-sizing: border-box !important;
-        }
-        .modal-box .field-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="css/confirm_booking.css">
 </head>
 <body class="app-body">
 
@@ -165,7 +29,7 @@ $imgPath = $post['image_path'] ?? $post['image'] ?? null;
     <div class="booking-container">
         <!-- LEFT: BILLING & PAYMENT FORM -->
         <div class="card">
-            <h3 class="card-title">&#128100; Billing & Traveler Details</h3>
+            <h3 class="card-title">Billing & Traveler Details</h3>
             <form id="checkoutForm" method="POST" action="index.php?page=booking&action=confirm" class="form">
                 <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
                 <input type="hidden" name="travelers" value="<?= $travelers ?>">
@@ -187,10 +51,10 @@ $imgPath = $post['image_path'] ?? $post['image'] ?? null;
                     <input type="date" name="travel_date" required min="<?= date('Y-m-d') ?>">
                 </div>
 
-                <h3 class="card-title" style="margin-top: 30px;">&#128179; Select Payment Method</h3>
+                <h3 class="card-title" style="margin-top: 30px;">Select Payment Method</h3>
                 <div class="payment-method-selector">
-                    <div class="pay-tab active" data-target="card">&#128179; Card</div>
-                    <div class="pay-tab" data-target="paypal">&#128184; PayPal</div>
+                    <div class="pay-tab active" data-target="card">Card</div>
+                    <div class="pay-tab" data-target="paypal">PayPal</div>
                 </div>
 
                 <div class="form-actions" style="margin-top: 30px;">
@@ -202,13 +66,13 @@ $imgPath = $post['image_path'] ?? $post['image'] ?? null;
 
         <!-- RIGHT: RESERVATION SUMMARY -->
         <div class="card" style="align-self: start;">
-            <h3 class="card-title">&#128203; Booking Summary</h3>
+            <h3 class="card-title">Booking Summary</h3>
             <?php if (!empty($imgPath)): ?>
                 <img src="<?= htmlspecialchars($imgPath) ?>" alt="<?= htmlspecialchars($post['title']) ?>" class="summary-post-img">
             <?php endif; ?>
             
             <h2 style="margin: 0 0 5px 0; font-size: 20px;"><?= htmlspecialchars($post['title']) ?></h2>
-            <p class="muted" style="margin: 0 0 15px 0; font-size: 13px;">&#128205; <?= htmlspecialchars($post['country']) ?> &middot; <?= ucfirst($post['genre']) ?></p>
+            <p class="muted" style="margin: 0 0 15px 0; font-size: 13px;"> <?= htmlspecialchars($post['country']) ?> &middot; <?= ucfirst($post['genre']) ?></p>
 
             <ul class="pricing-list">
                 <li>
@@ -235,7 +99,7 @@ $imgPath = $post['image_path'] ?? $post['image'] ?? null;
 <!-- CARD GATEWAY MODAL -->
 <div id="cardModal" class="modal-overlay">
     <div class="modal-box">
-        <h3 class="modal-title">&#128179; Credit / Debit Card Checkout</h3>
+        <h3 class="modal-title">Credit / Debit Card Checkout</h3>
         <div class="form">
             <div class="field">
                 <label>Cardholder Name</label>
@@ -272,7 +136,7 @@ $imgPath = $post['image_path'] ?? $post['image'] ?? null;
 <!-- PAYPAL MODAL -->
 <div id="paypalModal" class="modal-overlay">
     <div class="modal-box">
-        <h3 class="modal-title">💸 PayPal Account Login</h3>
+        <h3 class="modal-title">PayPal Account Login</h3>
         <div class="form">
             <div class="field">
                 <label>Email Address</label>
