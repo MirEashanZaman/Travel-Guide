@@ -337,7 +337,7 @@
 }
 
 .wishlist-card-btn .heart-icon::before {
-    content: "🤍";
+    content: "\2661";
 }
 
 .wishlist-card-btn.wishlisted {
@@ -347,7 +347,7 @@
 }
 
 .wishlist-card-btn.wishlisted .heart-icon::before {
-    content: "❤️";
+    content: "\2665";
 }
 
 .wishlist-card-btn.wishlisted:hover {
@@ -357,7 +357,7 @@
 }
 
 .wishlist-card-btn.wishlisted:hover .heart-icon::before {
-    content: "💔";
+    content: "\2715";
 }
 
 .post-card .post-meta {
