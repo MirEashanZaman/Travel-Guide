@@ -98,10 +98,10 @@ function approvePostRequest($conn, $requestId) {
     mysqli_stmt_close($stmt);
 
     if ($ok) {
-        // Determine post ID
+        //Determine post ID
         $postId = $originalPostId ? $originalPostId : mysqli_insert_id($conn);
 
-        // Determine cost from data
+        //Determine cost from data
         if (!isset($data['expected_cost'])) {
             $mapping = ['low' => 500, 'medium' => 1500, 'high' => 3000];
             $expectedCost = $mapping[strtolower($data['cost_level'] ?? 'medium')] ?? 1500;
@@ -109,7 +109,7 @@ function approvePostRequest($conn, $requestId) {
             $expectedCost = floatval($data['expected_cost']);
         }
 
-        // Insert or update in cost_estimates table
+        //Insert or update in cost_estimates table
         $checkEst = mysqli_prepare($conn, "SELECT id FROM cost_estimates WHERE post_id = ?");
         mysqli_stmt_bind_param($checkEst, 'i', $postId);
         mysqli_stmt_execute($checkEst);
@@ -129,15 +129,15 @@ function approvePostRequest($conn, $requestId) {
             mysqli_stmt_close($insEst);
         }
 
-        // Insert or update in itinerary_items table
+        //Insert or update in itinerary_items table
         if (isset($data['itinerary']) && is_array($data['itinerary'])) {
-            // Delete existing itinerary items first
+            //Delete existing itinerary items first
             $delItin = mysqli_prepare($conn, "DELETE FROM itinerary_items WHERE post_id = ?");
             mysqli_stmt_bind_param($delItin, 'i', $postId);
             mysqli_stmt_execute($delItin);
             mysqli_stmt_close($delItin);
 
-            // Insert new ones
+            //Insert new ones
             $insItin = mysqli_prepare($conn, "INSERT INTO itinerary_items (post_id, day_number, time_of_day, activity_title, activity_description, estimated_cost) VALUES (?, ?, ?, ?, ?, ?)");
             foreach ($data['itinerary'] as $item) {
                 $day = intval($item['day_number']);
@@ -154,7 +154,27 @@ function approvePostRequest($conn, $requestId) {
             mysqli_stmt_close($insItin);
         }
 
-        //Mark the request as approved so it doesn't show in pending list
+        if (isset($data['phrases']) && is_array($data['phrases'])) {
+            $delPhrases = mysqli_prepare($conn, "DELETE FROM local_phrases WHERE post_id = ?");
+            mysqli_stmt_bind_param($delPhrases, 'i', $postId);
+            mysqli_stmt_execute($delPhrases);
+            mysqli_stmt_close($delPhrases);
+
+            $insPhrases = mysqli_prepare($conn, "INSERT INTO local_phrases (post_id, phrase_no, original_phrase, translation, phonetic) VALUES (?, ?, ?, ?, ?)");
+            foreach ($data['phrases'] as $phrase) {
+                $no = intval($phrase['phrase_no']);
+                $orig = trim($phrase['original_phrase']);
+                $trans = trim($phrase['translation'] ?? '');
+                $phon = trim($phrase['phonetic'] ?? '');
+                
+                if ($orig !== '') {
+                    mysqli_stmt_bind_param($insPhrases, 'iisss', $postId, $no, $orig, $trans, $phon);
+                    mysqli_stmt_execute($insPhrases);
+                }
+            }
+            mysqli_stmt_close($insPhrases);
+        }
+
         $stmt = mysqli_prepare($conn, "UPDATE post_requests SET status = 'approved' WHERE id = ?");
         mysqli_stmt_bind_param($stmt, 'i', $requestId);
         mysqli_stmt_execute($stmt);
@@ -252,23 +272,23 @@ function updatePostAdmin($conn, $postId, $data) {
 function getDashboardStats($conn) {
     $stats = [];
     
-    // User counts by role
+    //User counts by role
     $r = mysqli_query($conn, "SELECT role, COUNT(*) as count FROM users GROUP BY role");
     $stats['users_by_role'] = mysqli_fetch_all($r, MYSQLI_ASSOC);
     
-    // Total users
+    //Total users
     $r = mysqli_query($conn, "SELECT COUNT(*) as count FROM users");
     $stats['total_users'] = mysqli_fetch_assoc($r)['count'];
     
-    // Pending requests
+    //Pending requests
     $r = mysqli_query($conn, "SELECT COUNT(*) as count FROM post_requests WHERE status = 'pending'");
     $stats['pending_requests'] = mysqli_fetch_assoc($r)['count'];
     
-    // Total posts
+    //Total posts
     $r = mysqli_query($conn, "SELECT COUNT(*) as count FROM posts WHERE status = 'approved'");
     $stats['total_posts'] = mysqli_fetch_assoc($r)['count'];
     
-    // Total comments
+    //Total comments
     $r = mysqli_query($conn, "SELECT COUNT(*) as count FROM comments");
     $stats['total_comments'] = mysqli_fetch_assoc($r)['count'];
     

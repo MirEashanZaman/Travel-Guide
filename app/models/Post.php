@@ -135,6 +135,65 @@ function getAllCountries($conn) {
     return mysqli_fetch_all($r, MYSQLI_ASSOC);
 }
 
+function getLocalPhrases($conn, $postId) {
+    $stmt = mysqli_prepare($conn, "SELECT * FROM local_phrases WHERE post_id = ? ORDER BY phrase_no ASC");
+    mysqli_stmt_bind_param($stmt, 'i', $postId);
+    mysqli_stmt_execute($stmt);
+    $rows = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+    mysqli_stmt_close($stmt);
+    return $rows;
+}
+
+function seedDefaultLocalPhrases($conn, $postId) {
+    $post = getPost($conn, $postId);
+    if (!$post) return false;
+    
+    $country = strtolower($post['country']);
+    
+    $phrases = [];
+    if (strpos($country, 'france') !== false || strpos($country, 'paris') !== false) {
+        $phrases = [
+            ['no' => 1, 'orig' => 'Bonjour', 'trans' => 'Hello / Good morning', 'phon' => 'bohn-zhoor'],
+            ['no' => 2, 'orig' => 'Merci beaucoup', 'trans' => 'Thank you very much', 'phon' => 'mair-see boh-koo'],
+            ['no' => 3, 'orig' => 'S\'il vous plaît', 'trans' => 'Please', 'phon' => 'seel voo pleh'],
+            ['no' => 4, 'orig' => 'Excusez-moi, pourriez-vous m\'aider?', 'trans' => 'Excuse me, could you help me?', 'phon' => 'ek-skew-zay mwah, poo-ree-ay voo may-day'],
+            ['no' => 5, 'orig' => 'L\'addition, s\'il vous plaît', 'trans' => 'The bill, please', 'phon' => 'lah-dee-syohn seel voo pleh']
+        ];
+    } elseif (strpos($country, 'germany') !== false || strpos($country, 'berlin') !== false) {
+        $phrases = [
+            ['no' => 1, 'orig' => 'Guten Tag', 'trans' => 'Hello / Good day', 'phon' => 'goo-ten tahk'],
+            ['no' => 2, 'orig' => 'Danke schön', 'trans' => 'Thank you very much', 'phon' => 'dahn-kuh shuhn'],
+            ['no' => 3, 'orig' => 'Bitte', 'trans' => 'Please / You\'re welcome', 'phon' => 'bit-tuh'],
+            ['no' => 4, 'orig' => 'Entschuldigung, könnten Sie mir helfen?', 'trans' => 'Pardon me, could you help me?', 'phon' => 'ent-shool-dee-goong, kuhn-ten zee meer hel-fen'],
+            ['no' => 5, 'orig' => 'Die Rechnung, bitte', 'trans' => 'The bill, please', 'phon' => 'dee rekh-noong bit-tuh']
+        ];
+    } elseif (strpos($country, 'bangladesh') !== false || strpos($country, 'dhaka') !== false || strpos($country, 'sylhet') !== false) {
+        $phrases = [
+            ['no' => 1, 'orig' => 'Assalamualaikum / Shagotom', 'trans' => 'Peace be upon you / Welcome', 'phon' => 'ash-salaam-mu-alaikum / sha-go-tom'],
+            ['no' => 2, 'orig' => 'Dhonnobad', 'trans' => 'Thank you', 'phon' => 'dhon-no-bad'],
+            ['no' => 3, 'orig' => 'Doya kore', 'trans' => 'Please', 'phon' => 'do-ya ko-re'],
+            ['no' => 4, 'orig' => 'Washroom kothay?', 'trans' => 'Where is the washroom?', 'phon' => 'washroom ko-thay'],
+            ['no' => 5, 'orig' => 'Etar dam koto?', 'trans' => 'How much is this?', 'phon' => 'e-tar dam ko-to']
+        ];
+    } else {
+        $phrases = [
+            ['no' => 1, 'orig' => 'Hello', 'trans' => 'Welcome / Greetings', 'phon' => 'heh-low'],
+            ['no' => 2, 'orig' => 'Thank you', 'trans' => 'Expression of gratitude', 'phon' => 'thangk yoo'],
+            ['no' => 3, 'orig' => 'Please', 'trans' => 'Polite request', 'phon' => 'pleez'],
+            ['no' => 4, 'orig' => 'Where is the restroom?', 'trans' => 'Asking for toilet', 'phon' => 'wair iz thee rest-room'],
+            ['no' => 5, 'orig' => 'How much is this?', 'trans' => 'Asking for price', 'phon' => 'how muhch iz this']
+        ];
+    }
+    
+    $ins = mysqli_prepare($conn, "INSERT INTO local_phrases (post_id, phrase_no, original_phrase, translation, phonetic) VALUES (?, ?, ?, ?, ?)");
+    foreach ($phrases as $p) {
+        mysqli_stmt_bind_param($ins, 'iisss', $postId, $p['no'], $p['orig'], $p['trans'], $p['phon']);
+        mysqli_stmt_execute($ins);
+    }
+    mysqli_stmt_close($ins);
+    return true;
+}
+
 function getItinerary($conn, $postId) {
     $stmt = mysqli_prepare($conn, "SELECT * FROM itinerary_items WHERE post_id = ? ORDER BY day_number ASC, FIELD(time_of_day, 'morning', 'afternoon', 'evening') ASC");
     mysqli_stmt_bind_param($stmt, 'i', $postId);
