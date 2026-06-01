@@ -1,6 +1,6 @@
 <?php
 
-// Create a new booking entry
+//Create a new booking entry
 function createBooking($conn, $userId, $postId, $travelers, $days, $totalCost, $travelDate, $billingName, $billingEmail, $paymentMethod, $transactionId) {
     $stmt = mysqli_prepare($conn, 
         "INSERT INTO bookings (user_id, post_id, travelers, days, total_cost, travel_date, billing_name, billing_email, payment_method, transaction_id, status) 
@@ -12,7 +12,7 @@ function createBooking($conn, $userId, $postId, $travelers, $days, $totalCost, $
     return $ok;
 }
 
-// Fetch a single booking record by ID with destination details
+//Fetch a single booking record by ID with destination details
 function getBooking($conn, $id) {
     $stmt = mysqli_prepare($conn, 
         "SELECT bookings.*, posts.title as post_title, posts.country as post_country, posts.genre as post_genre, posts.image_path as post_image 
@@ -27,7 +27,7 @@ function getBooking($conn, $id) {
     return $row;
 }
 
-// Fetch all bookings for a specific user
+//Fetch all bookings for a specific user
 function getBookingsByUser($conn, $userId) {
     $stmt = mysqli_prepare($conn, 
         "SELECT bookings.*, posts.title as post_title, posts.country as post_country 
@@ -43,7 +43,7 @@ function getBookingsByUser($conn, $userId) {
     return $rows;
 }
 
-// Check if a specific user has booked a specific destination
+//Check if a specific user has booked a specific destination
 function hasUserBookedPost($conn, $userId, $postId) {
     $stmt = mysqli_prepare($conn, "SELECT id FROM bookings WHERE user_id = ? AND post_id = ? AND status = 'paid' LIMIT 1");
     mysqli_stmt_bind_param($stmt, 'ii', $userId, $postId);
